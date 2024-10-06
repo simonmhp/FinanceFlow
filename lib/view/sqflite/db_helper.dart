@@ -22,7 +22,8 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     // Get the path to the database
-    String path = join(await getDatabasesPath(), 'user_database.db');
+    String path =
+        join(await getDatabasesPath(), 'app_database.db'); // Unified DB
 
     // Open or create the database
     return await openDatabase(
@@ -32,7 +33,8 @@ class DatabaseHelper {
     );
   }
 
-  // Create the user table
+  // ******************* Create both users and transactions tables *******************
+
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE users (
@@ -43,23 +45,26 @@ class DatabaseHelper {
         dataChange TEXT DEFAULT NULL
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        description TEXT NOT NULL,
+        transaction_type TEXT NOT NULL,
+        amount REAL NOT NULL,
+        date TEXT NOT NULL,
+        category TEXT NOT NULL,
+        categoryImg TEXT NOT NULL
+      )
+    ''');
   }
 
-  // Function to insert a user into the database
+  // ******************* User Table Methods *******************
+
+  // Insert a user into the database
   Future<int> insertUser(Map<String, dynamic> user) async {
     final db = await database;
     return await db.insert('users', user);
-  }
-
-  // Fetch all users (for testing purposes)
-  // Future<List<Map<String, dynamic>>> getUsers() async {
-  //   final db = await database;
-  //   return await db.query('users');
-  // }
-  // logOut Users Truncate Method
-  Future<void> truncateUsers() async {
-    final db = await database;
-    await db.execute('DELETE FROM users'); // Truncate the table
   }
 
   // Fetch a single user (returns the first user found)
@@ -68,13 +73,73 @@ class DatabaseHelper {
     final List<Map<String, dynamic>> maps = await db.query('users', limit: 1);
     return maps.isNotEmpty ? maps.first : null; // Return the first user or null
   }
+
+  // Truncate users table (log out)
+  Future<void> truncateUsers() async {
+    final db = await database;
+    await db.execute('DELETE FROM users'); // Truncate the table
+  }
+
+  // ******************* Transaction Table Methods *******************
+
+  // Insert a transaction into the database
+  Future<int> insertTransaction(Map<String, dynamic> transaction) async {
+    final db = await database;
+    return await db.insert('transactions', transaction);
+  }
+
+  // Fetch all transactions and group them by category and image
+  Future<List<Map<String, dynamic>>> getTransactions() async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT category, categoryImg, SUM(CASE WHEN transaction_type = 'Debit' THEN amount ELSE 0 END) as amount
+    FROM transactions
+    WHERE transaction_type = 'Debit'
+    GROUP BY category, categoryImg
+  ''');
+
+    return result;
+  }
+
+  // Fetch a single transaction by ID
+  Future<Map<String, dynamic>?> getTransaction(int id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'transactions',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    return maps.isNotEmpty
+        ? maps.first
+        : null; // Return the first transaction or null
+  }
+
+  // Update a transaction by ID
+  Future<int> updateTransaction(
+      int id, Map<String, dynamic> transaction) async {
+    final db = await database;
+    return await db.update(
+      'transactions',
+      transaction,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  // Delete a transaction by ID
+  Future<int> deleteTransaction(int id) async {
+    final db = await database;
+    return await db.delete(
+      'transactions',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  // Truncate transactions table
+  Future<void> truncateTransactions() async {
+    final db = await database;
+    await db.delete('transactions'); // This effectively truncates the table
+  }
 }
-
-
-
-      // Store the user details in SQLite
-      // await _databaseHelper.insertUser({
-      //   'email': txtEmail.text.trim(),
-      //   'password': txtPassword.text.trim(),
-      //   'username': txtUsername.text.trim(), // Save username
-      // });

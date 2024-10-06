@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:moneytracker/common/color_extension.dart';
-
+import 'package:moneytracker/common/color_extension.dart'; // Import your DatabaseHelper
+import 'package:moneytracker/view/sqflite/db_helper.dart';
 import '../../common_widget/custom_arc_painter.dart';
 import '../../common_widget/segment_button.dart';
 import '../../common_widget/status_button.dart';
 import '../../common_widget/subscription_home_row.dart';
 import '../../common_widget/upcoming_bill_row.dart';
 import '../settings/settings_view.dart';
-import '../subscription_info/subscription_info_view.dart';
+import '../subscription_info/subscription_info_view.dart'; // Updated DatabaseHelper import
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -18,35 +18,24 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   bool isSubscription = true;
-  List subArr = [
-    {"name": "Spotify", "icon": "assets/img/spotify_logo.png", "price": "5.99"},
-    {
-      "name": "YouTube Premium",
-      "icon": "assets/img/youtube_logo.png",
-      "price": "18.99"
-    },
-    {
-      "name": "Microsoft OneDrive",
-      "icon": "assets/img/onedrive_logo.png",
-      "price": "29.99"
-    },
-    {"name": "NetFlix", "icon": "assets/img/netflix_logo.png", "price": "15.00"}
-  ];
+  List<Map<String, dynamic>> transactionData =
+      []; // To hold data from the transaction table
 
-  List bilArr = [
-    {"name": "Spotify", "date": DateTime(2023, 07, 25), "price": "5.99"},
-    {
-      "name": "YouTube Premium",
-      "date": DateTime(2023, 07, 25),
-      "price": "18.99"
-    },
-    {
-      "name": "Microsoft OneDrive",
-      "date": DateTime(2023, 07, 25),
-      "price": "29.99"
-    },
-    {"name": "NetFlix", "date": DateTime(2023, 07, 25), "price": "15.00"}
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchTransactionData(); // Fetch the data when the view is initialized
+  }
+
+  Future<void> _fetchTransactionData() async {
+    DatabaseHelper dbHelper =
+        DatabaseHelper(); // Use DatabaseHelper instead of TransactionHelper
+    List<Map<String, dynamic>> data =
+        await dbHelper.getTransactions(); // Query to sum up amounts by category
+    setState(() {
+      transactionData = data; // Update the state with fetched data
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,13 +97,11 @@ class _HomeViewState extends State<HomeView> {
                       SizedBox(
                         height: media.width * 0.05,
                       ),
-                      // Image.asset("assets/img/app_logo.png",
-                      //     width: media.width * 0.25, fit: BoxFit.contain),
                       SizedBox(
                         height: media.width * 0.07,
                       ),
                       Text(
-                        "₹1,235",
+                        "₹1,235", // You might want to calculate and display total expenses
                         style: TextStyle(
                             color: TColor.white,
                             fontSize: 40,
@@ -165,7 +152,7 @@ class _HomeViewState extends State<HomeView> {
                             Expanded(
                               child: StatusButton(
                                 title: "Highest",
-                                value: "₹12000",
+                                value: "₹12000", // Update based on your logic
                                 statusColor: TColor.secondary,
                                 onPressed: () {},
                               ),
@@ -176,7 +163,7 @@ class _HomeViewState extends State<HomeView> {
                             Expanded(
                               child: StatusButton(
                                 title: "Avg (per day)",
-                                value: "₹890",
+                                value: "₹890", // Update based on your logic
                                 statusColor: TColor.primary10,
                                 onPressed: () {},
                               ),
@@ -187,7 +174,7 @@ class _HomeViewState extends State<HomeView> {
                             Expanded(
                               child: StatusButton(
                                 title: "Lowest",
-                                value: "₹10",
+                                value: "₹10", // Update based on your logic
                                 statusColor: TColor.secondaryG,
                                 onPressed: () {},
                               ),
@@ -214,7 +201,7 @@ class _HomeViewState extends State<HomeView> {
                       isActive: isSubscription,
                       onPressed: () {
                         setState(() {
-                          isSubscription = !isSubscription;
+                          isSubscription = true;
                         });
                       },
                     ),
@@ -225,7 +212,7 @@ class _HomeViewState extends State<HomeView> {
                       isActive: !isSubscription,
                       onPressed: () {
                         setState(() {
-                          isSubscription = !isSubscription;
+                          isSubscription = false;
                         });
                       },
                     ),
@@ -239,18 +226,23 @@ class _HomeViewState extends State<HomeView> {
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: subArr.length,
+                  itemCount: transactionData.length,
                   itemBuilder: (context, index) {
-                    var sObj = subArr[index] as Map? ?? {};
-
+                    var transaction = transactionData[index];
                     return SubScriptionHomeRow(
-                      sObj: sObj,
+                      sObj: {
+                        "name": transaction['category'], // Use category column
+                        "icon":
+                            transaction['categoryImg'], // Use category image
+                        "price":
+                            transaction['amount'].toString(), // Use the amount
+                      },
                       onPressed: () {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    SubscriptionInfoView(sObj: sObj)));
+                                    SubscriptionInfoView(sObj: transaction)));
                       },
                     );
                   }),
@@ -260,12 +252,11 @@ class _HomeViewState extends State<HomeView> {
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: subArr.length,
+                  itemCount: transactionData.length,
                   itemBuilder: (context, index) {
-                    var sObj = subArr[index] as Map? ?? {};
-
+                    var transaction = transactionData[index];
                     return UpcomingBillRow(
-                      sObj: sObj,
+                      sObj: transaction,
                       onPressed: () {},
                     );
                   }),
