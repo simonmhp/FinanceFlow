@@ -256,8 +256,8 @@ class _HomeViewState extends State<HomeView> {
                     sObj: {
                       "name": transaction['category'], // Use category column
                       "icon": transaction['categoryImg'], // Use category image
-                      "price":
-                          transaction['amount'].toString(), // Use the amount
+                      "price": formatIndianCurrency(transaction['amount'])
+                          .toString(), // Use the amount
                     },
                     onPressed: () {
                       Navigator.push(
