@@ -89,7 +89,7 @@ class DatabaseHelper {
   }
 
   // Fetch all transactions and group them by category and image
-  Future<List<Map<String, dynamic>>> getTransactions() async {
+  Future<List<Map<String, dynamic>>> getHomeTransactions() async {
     final db = await database;
 
     final List<Map<String, dynamic>> result = await db.rawQuery('''
@@ -98,6 +98,84 @@ class DatabaseHelper {
     WHERE transaction_type = 'Debit'
     GROUP BY category, categoryImg
   ''');
+
+    return result;
+  }
+
+  Future<double> getMonthHighestExpense() async {
+    final db = await database;
+
+    // Get the current year and month
+    final DateTime now = DateTime.now();
+    final int year = now.year;
+    final int month = now.month;
+
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT MAX(amount) AS maxAmount
+    FROM transactions
+    WHERE transaction_type = 'Debit'
+      AND strftime('%Y', date) = ? 
+      AND strftime('%m', date) = ?
+  ''', ['$year', '$month']); // Bind year and month as parameters
+
+    // Check if the result is not empty and return the max amount or 0
+    return result.isNotEmpty ? result.first['maxAmount'] ?? 0.0 : 0.0;
+  }
+
+  Future<double> getMonthLowestExpense() async {
+    final db = await database;
+
+    // Get the current year and month
+    final DateTime now = DateTime.now();
+    final int year = now.year;
+    final int month = now.month;
+
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT MIN(amount) AS maxAmount
+    FROM transactions
+    WHERE transaction_type = 'Debit'
+      AND strftime('%Y', date) = ? 
+      AND strftime('%m', date) = ?
+  ''', ['$year', '$month']); // Bind year and month as parameters
+
+    // Check if the result is not empty and return the max amount or 0
+    return result.isNotEmpty ? result.first['maxAmount'] ?? 0.0 : 0.0;
+  }
+
+  Future<double> getMonthCreditTotalExpense() async {
+    final db = await database;
+
+    // Get the current year and month
+    final DateTime now = DateTime.now();
+    final int year = now.year;
+    final int month = now.month;
+
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT SUM(amount) AS maxAmount
+    FROM transactions
+    WHERE transaction_type = 'Debit'
+      AND strftime('%Y', date) = ? 
+      AND strftime('%m', date) = ?
+  ''', ['$year', '$month']); // Bind year and month as parameters
+
+    // Check if the result is not empty and return the max amount or 0
+    return result.isNotEmpty ? result.first['maxAmount'] ?? 0.0 : 0.0;
+  }
+
+  Future<List<Map<String, dynamic>>>
+      getCreditTransactionsForCurrentMonth() async {
+    final db = await database;
+
+    final currentMonth = DateTime.now().month;
+    final currentYear = DateTime.now().year;
+
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT description, amount, date
+    FROM transactions
+    WHERE transaction_type = 'Credit'
+    AND strftime('%m', date) = ? 
+    AND strftime('%Y', date) = ?
+  ''', [currentMonth.toString().padLeft(2, '0'), currentYear.toString()]);
 
     return result;
   }

@@ -5,7 +5,6 @@ import 'package:moneytracker/common_widget/primary_button.dart';
 import 'package:moneytracker/common_widget/round_dropdown.dart';
 import 'package:moneytracker/common_widget/round_textfield.dart';
 import 'package:moneytracker/view/sqflite/db_helper.dart';
-import 'package:moneytracker/view/sqflite/transaction_helper.dart';
 import '../../common_widget/image_button.dart';
 
 class AddSubScriptionView extends StatefulWidget {
