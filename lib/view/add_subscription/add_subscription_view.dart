@@ -4,6 +4,7 @@ import 'package:moneytracker/common/color_extension.dart';
 import 'package:moneytracker/common_widget/primary_button.dart';
 import 'package:moneytracker/common_widget/round_dropdown.dart';
 import 'package:moneytracker/common_widget/round_textfield.dart';
+import 'package:moneytracker/view/sqflite/transaction_helper.dart';
 import '../../common_widget/image_button.dart';
 
 class AddSubScriptionView extends StatefulWidget {
@@ -15,7 +16,9 @@ class AddSubScriptionView extends StatefulWidget {
 
 class _AddSubScriptionViewState extends State<AddSubScriptionView> {
   TextEditingController txtDescription = TextEditingController();
-  String? selectedTransactionType; // Added for dropdown state management
+  String? selectedTransactionType;
+  String? selectedCategory; // Added for storing selected category
+  String? selectedCategoryImg; // Added for storing selected category image URL
 
   List subArr = [
     {
@@ -133,24 +136,32 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
                       ),
                     ),
                     SizedBox(
-                        width: media.width,
-                        height: media.width * 0.6,
-                        child: CarouselSlider.builder(
-                          options: CarouselOptions(
-                            autoPlay: false,
-                            aspectRatio: 1,
-                            enlargeCenterPage: true,
-                            enableInfiniteScroll: true,
-                            viewportFraction: 0.65,
-                            enlargeFactor: 0.4,
-                            enlargeStrategy: CenterPageEnlargeStrategy.zoom,
-                            initialPage: 0, // Always start from the first index
-                          ),
-                          itemCount: subArr.length,
-                          itemBuilder: (BuildContext context, int itemIndex,
-                              int pageViewIndex) {
-                            var sObj = subArr[itemIndex] as Map? ?? {};
-                            return Container(
+                      width: media.width,
+                      height: media.width * 0.6,
+                      child: CarouselSlider.builder(
+                        options: CarouselOptions(
+                          autoPlay: false,
+                          aspectRatio: 1,
+                          enlargeCenterPage: true,
+                          enableInfiniteScroll: true,
+                          viewportFraction: 0.65,
+                          enlargeFactor: 0.4,
+                          enlargeStrategy: CenterPageEnlargeStrategy.zoom,
+                          initialPage: 0,
+                        ),
+                        itemCount: subArr.length,
+                        itemBuilder: (BuildContext context, int itemIndex,
+                            int pageViewIndex) {
+                          var sObj = subArr[itemIndex] as Map? ?? {};
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedCategory = sObj["name"];
+                                selectedCategoryImg = sObj[
+                                    "icon"]; // Store the selected category image
+                              });
+                            },
+                            child: Container(
                               margin: const EdgeInsets.all(10),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -171,14 +182,15 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
                                   ),
                                 ],
                               ),
-                            );
-                          },
-                        ))
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-            // Separate Padding for RoundTextField
             Padding(
               padding: const EdgeInsets.only(top: 30, left: 20, right: 20),
               child: RoundTextField(
@@ -187,7 +199,6 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
                 controller: txtDescription,
               ),
             ),
-            // Separate Padding for RoundDropdown
             Padding(
               padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
               child: RoundDropdown(
@@ -206,7 +217,6 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Minus Button
                   ImageButton(
                     image: "assets/img/minus.png",
                     onPressed: () {
@@ -217,11 +227,9 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
                       setState(() {});
                     },
                   ),
-
                   Expanded(
                     child: Column(
                       children: [
-                        // "Monthly price" Text
                         Text(
                           "Monthly price",
                           style: TextStyle(
@@ -231,8 +239,6 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
                           ),
                         ),
                         const SizedBox(height: 4),
-
-                        // Input field for manual rupee entry
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                           child: Container(
@@ -250,7 +256,7 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
                               ),
                               textAlign: TextAlign.center,
                               controller: TextEditingController(
-                                text: amountVal.toString(), // Remove decimals
+                                text: amountVal.toString(),
                               ),
                               decoration: InputDecoration(
                                 border: InputBorder.none,
@@ -263,26 +269,15 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
                               ),
                               onChanged: (value) {
                                 setState(() {
-                                  // Update amountVal when the user manually enters a value
                                   amountVal = int.tryParse(value) ?? amountVal;
                                 });
                               },
                             ),
                           ),
-
-                          // const SizedBox(height: 8),
-                          // // Horizontal line
-                          // Container(
-                          //   width: double.maxFinite,
-                          //   height: 1,
-                          //   color: TColor.gray70,
-                          // ),
                         ),
                       ],
                     ),
                   ),
-
-                  // Plus Button
                   ImageButton(
                     image: "assets/img/plus.png",
                     onPressed: () {
@@ -297,7 +292,8 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: PrimaryButton(
                 title: "Add this transaction",
-                onPressed: () {},
+                onPressed: () =>
+                    _addTransaction(context), // Call the new function
               ),
             ),
             const SizedBox(height: 20),
@@ -305,5 +301,32 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
         ),
       ),
     );
+  }
+
+  Future<void> _addTransaction(BuildContext context) async {
+    if (selectedCategory != null && selectedTransactionType != null) {
+      // Prepare the transaction data
+      final transactionData = {
+        'description': txtDescription.text,
+        'transaction_type': selectedTransactionType,
+        'amount': amountVal,
+        'date': DateTime.now().toIso8601String(),
+        'category': selectedCategory,
+        'categoryImg': selectedCategoryImg,
+      };
+
+      // Insert the transaction using TransactionHelper
+      final transactionHelper = TransactionHelper();
+      await transactionHelper.insertTransaction(transactionData);
+
+      // Optionally, navigate back or show a success message
+      Navigator.pop(context);
+    } else {
+      // Show an error message if required fields are not filled
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text("Please select a category and transaction type.")),
+      );
+    }
   }
 }

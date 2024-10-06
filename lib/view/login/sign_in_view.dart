@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async'; // For the 3-second delay
 import 'package:moneytracker/view/login/sign_up_view.dart';
 import 'package:moneytracker/view/home/home_view.dart'; // Assuming HomeView is the page to navigate after successful login
+import 'package:moneytracker/view/main_tab/main_tab_view.dart';
+import 'package:moneytracker/view/sqflite/db_helper.dart';
 
 import '../../common/color_extension.dart';
 import '../../common_widget/primary_button.dart';
@@ -25,8 +28,9 @@ class _SignInViewState extends State<SignInView> {
 
   Future<void> signInUser() async {
     setState(() {
-      isLoading = true; // Show loading indicator
+      isLoading = true;
     });
+
     try {
       // Firebase sign-in logic
       UserCredential userCredential =
@@ -34,6 +38,25 @@ class _SignInViewState extends State<SignInView> {
         email: txtEmail.text.trim(),
         password: txtPassword.text.trim(),
       );
+
+      // Retrieve user info
+      String uid = userCredential.user!.uid; // User UID
+      String email = userCredential.user!.email!; // User email
+
+      // Assuming you have a method to retrieve the username from Firebase
+      String username = await getUsernameFromFirebase(
+          uid); // Implement this method to get the username
+
+      // Prepare user data for SQLite insertion
+      Map<String, dynamic> userData = {
+        'email': email,
+        'password': txtPassword.text.trim(),
+        'username': username,
+        'dataChange': DateTime.now().toString()
+      };
+
+      // Insert user data into SQLite
+      await DatabaseHelper().insertUser(userData);
 
       // Show toast message on success
       Fluttertoast.showToast(
@@ -50,12 +73,11 @@ class _SignInViewState extends State<SignInView> {
       // Navigate to another page (e.g., HomeView)
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-            builder: (context) =>
-                const HomeView()), // Change HomeView to the page you want to navigate to
+        MaterialPageRoute(builder: (context) => const MainTabView()),
       );
     } catch (e) {
       // Show error toast if login fails
+      print("Login failed: ${e.toString()}");
       Fluttertoast.showToast(
         msg: "Login failed: ${e.toString()}",
         toastLength: Toast.LENGTH_LONG,
@@ -65,9 +87,21 @@ class _SignInViewState extends State<SignInView> {
       );
     } finally {
       setState(() {
-        isLoading = false; // Hide loading indicator after authentication
+        isLoading = false;
       });
     }
+  }
+
+  Future<String> getUsernameFromFirebase(String uid) async {
+    // Assuming you have a Firestore instance
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+    if (userDoc.exists) {
+      return userDoc.data()?['username'] ??
+          ''; // Adjust according to your Firestore structure
+    }
+    return ''; // Default username if not found
   }
 
   @override
