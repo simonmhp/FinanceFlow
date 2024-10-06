@@ -26,12 +26,36 @@ class CreditHomeRow extends StatelessWidget {
           alignment: Alignment.center,
           child: Row(
             children: [
-              Text(
-                sObj["day"], // Displaying day of the month
-                style: TextStyle(
-                  color: TColor.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+              // Date container
+              Container(
+                height: 40,
+                width: 40,
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: TColor.gray70.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      sObj["month"], // Month display
+                      style: TextStyle(
+                        color: TColor.gray30,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      sObj["day"], // Day display
+                      style: TextStyle(
+                        color: TColor.gray30,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(width: 8),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moneytracker/common/color_extension.dart';
+import 'package:moneytracker/view/home/helper.dart';
 import 'package:moneytracker/view/sqflite/db_helper.dart';
 import '../../common_widget/custom_arc_painter.dart';
 import '../../common_widget/segment_button.dart';
@@ -120,7 +121,8 @@ class _HomeViewState extends State<HomeView> {
                       SizedBox(height: media.width * 0.05),
                       SizedBox(height: media.width * 0.07),
                       Text(
-                        "${formatIndianCurrency(monthTotalExpense)}", // x Display the highest expense
+                        HomeHelper.formatIndianCurrency(
+                            monthTotalExpense), // x Display the highest expense
                         style: TextStyle(
                           color: TColor.white,
                           fontSize: 40,
@@ -170,7 +172,7 @@ class _HomeViewState extends State<HomeView> {
                             Expanded(
                               child: StatusButton(
                                 title: "Highest",
-                                value: formatIndianCurrency(
+                                value: HomeHelper.formatIndianCurrency(
                                     highestExpense), // Update based on your logic
                                 statusColor: TColor.secondary,
                                 onPressed: () {},
@@ -181,7 +183,7 @@ class _HomeViewState extends State<HomeView> {
                               child: StatusButton(
                                 title: "Avg (per day)",
                                 value: (monthTotalExpense.toInt() /
-                                        _getDaysInCurrentMonth())
+                                        HomeHelper.getDaysInCurrentMonth())
                                     .toStringAsFixed(
                                         1), // Format to 2 decimal points
                                 statusColor: TColor.primary10,
@@ -192,7 +194,7 @@ class _HomeViewState extends State<HomeView> {
                             Expanded(
                               child: StatusButton(
                                 title: "Lowest",
-                                value: formatIndianCurrency(
+                                value: HomeHelper.formatIndianCurrency(
                                     lowestExpense), // Update based on your logic
                                 statusColor: TColor.secondaryG,
                                 onPressed: () {},
@@ -256,8 +258,9 @@ class _HomeViewState extends State<HomeView> {
                     sObj: {
                       "name": transaction['category'], // Use category column
                       "icon": transaction['categoryImg'], // Use category image
-                      "price": formatIndianCurrency(transaction['amount'])
-                          .toString(), // Use the amount
+                      "price":
+                          HomeHelper.formatIndianCurrency(transaction['amount'])
+                              .toString(), // Use the amount
                     },
                     onPressed: () {
                       Navigator.push(
@@ -315,9 +318,10 @@ class _HomeViewState extends State<HomeView> {
                           ),
                         ),
                         Text(
-                          "₹${transaction['amount'].toString()}", // Display the amount
+                          HomeHelper.formatIndianCurrency(
+                              transaction['amount']), // Display the amount
                           style: TextStyle(
-                            color: TColor.secondary,
+                            color: TColor.primary5,
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                           ),
@@ -362,51 +366,51 @@ class _HomeViewState extends State<HomeView> {
   //   return formattedWholePart;
   // }
 
-  String formatIndianCurrency(double amount) {
-    // Convert the amount to an integer
-    int wholeAmount = amount.toInt();
+  // String formatIndianCurrency(double amount) {
+  //   // Convert the amount to an integer
+  //   int wholeAmount = amount.toInt();
 
-    // Handle crore and lakh cases
-    if (wholeAmount >= 10000000) {
-      // 1 crore
-      double inCrores = wholeAmount / 10000000;
-      return '₹${inCrores.toStringAsFixed(2).replaceAll('.00', '')}Cr'; // Remove .00 if it's a whole number
-    } else if (wholeAmount >= 100000) {
-      // 1 lakh
-      double inLakhs = wholeAmount / 100000;
-      return '₹${inLakhs.toStringAsFixed(2).replaceAll('.00', '')}L'; // Remove .00 if it's a whole number
-    } else {
-      // Convert to string and add ₹ symbol
-      String amountStr = wholeAmount.toString();
+  //   // Handle crore and lakh cases
+  //   if (wholeAmount >= 10000000) {
+  //     // 1 crore
+  //     double inCrores = wholeAmount / 10000000;
+  //     return '₹${inCrores.toStringAsFixed(2).replaceAll('.00', '')}Cr'; // Remove .00 if it's a whole number
+  //   } else if (wholeAmount >= 100000) {
+  //     // 1 lakh
+  //     double inLakhs = wholeAmount / 100000;
+  //     return '₹${inLakhs.toStringAsFixed(2).replaceAll('.00', '')}L'; // Remove .00 if it's a whole number
+  //   } else {
+  //     // Convert to string and add ₹ symbol
+  //     String amountStr = wholeAmount.toString();
 
-      // Apply Indian-style formatting for thousands
-      String formattedWholePart;
+  //     // Apply Indian-style formatting for thousands
+  //     String formattedWholePart;
 
-      if (amountStr.length > 3) {
-        // Get last three digits
-        String lastThreeDigits = amountStr.substring(amountStr.length - 3);
-        String remainingDigits = amountStr.substring(0, amountStr.length - 3);
+  //     if (amountStr.length > 3) {
+  //       // Get last three digits
+  //       String lastThreeDigits = amountStr.substring(amountStr.length - 3);
+  //       String remainingDigits = amountStr.substring(0, amountStr.length - 3);
 
-        // Add commas in the remaining digits
-        if (remainingDigits.isNotEmpty) {
-          formattedWholePart = remainingDigits.replaceAllMapped(
-                  RegExp(r'(?<=\d)(?=(\d{2})+(?!\d))'), (Match m) => ',') +
-              ',' +
-              lastThreeDigits;
-        } else {
-          formattedWholePart = lastThreeDigits; // No remaining digits
-        }
-      } else {
-        formattedWholePart = amountStr; // Less than 1000, no formatting needed
-      }
+  //       // Add commas in the remaining digits
+  //       if (remainingDigits.isNotEmpty) {
+  //         formattedWholePart = remainingDigits.replaceAllMapped(
+  //                 RegExp(r'(?<=\d)(?=(\d{2})+(?!\d))'), (Match m) => ',') +
+  //             ',' +
+  //             lastThreeDigits;
+  //       } else {
+  //         formattedWholePart = lastThreeDigits; // No remaining digits
+  //       }
+  //     } else {
+  //       formattedWholePart = amountStr; // Less than 1000, no formatting needed
+  //     }
 
-      return '₹$formattedWholePart'; // Return the formatted amount
-    }
-  }
+  //     return '₹$formattedWholePart'; // Return the formatted amount
+  //   }
+  // }
 
-  int _getDaysInCurrentMonth() {
-    final now = DateTime.now();
-    // Using the next month's first day minus one day
-    return DateTime(now.year, now.month + 1, 0).day;
-  }
+  // int _getDaysInCurrentMonth() {
+  //   final now = DateTime.now();
+  //   // Using the next month's first day minus one day
+  //   return DateTime(now.year, now.month + 1, 0).day;
+  // }
 }
