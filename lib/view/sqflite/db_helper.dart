@@ -57,6 +57,16 @@ class DatabaseHelper {
         categoryImg TEXT NOT NULL
       )
     ''');
+
+    // Create the Budget table
+    await db.execute('''
+      CREATE TABLE budget (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        category TEXT NOT NULL,
+        budget REAL NOT NULL,
+        month TEXT NOT NULL
+      )
+    ''');
   }
 
   // ******************* User Table Methods *******************
@@ -238,5 +248,46 @@ class DatabaseHelper {
   Future<void> truncateTransactions() async {
     final db = await database;
     await db.delete('transactions'); // This effectively truncates the table
+  }
+
+  // ******************* Budget Table Methods *******************
+
+  // Insert a budget into the database
+  Future<int> insertBudget(Map<String, dynamic> budget) async {
+    final db = await database;
+    return await db.insert('budget', budget);
+  }
+
+// Fetch all budgets
+  Future<List<Map<String, dynamic>>> getAllBudgets() async {
+    final db = await database;
+    return await db.query('budget');
+  }
+
+// Update a budget by ID
+  Future<int> updateBudget(int id, Map<String, dynamic> budget) async {
+    final db = await database;
+    return await db.update(
+      'budget',
+      budget,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+// Delete a budget by ID
+  Future<int> deleteBudget(int id) async {
+    final db = await database;
+    return await db.delete(
+      'budget',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+// Truncate budget table
+  Future<void> truncateBudgets() async {
+    final db = await database;
+    await db.delete('budget'); // This effectively truncates the table
   }
 }

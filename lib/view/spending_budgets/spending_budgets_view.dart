@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:moneytracker/common/color_extension.dart';
 import 'package:moneytracker/common_widget/budgets_row.dart';
 import 'package:moneytracker/common_widget/custom_arc_180_painter.dart';
+import 'package:moneytracker/common_widget/show_add_category_dialog.dart';
 
 import '../settings/settings_view.dart';
 
@@ -163,30 +164,35 @@ class _SpendingBudgetsViewState extends State<SpendingBudgetsView> {
                   borderType: BorderType.RRect,
                   radius: const Radius.circular(16),
                   color: TColor.border.withOpacity(0.1),
-                  child: Container(
-                    height: 64,
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    alignment: Alignment.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Add new category ",
-                          style: TextStyle(
-                              color: TColor.gray30,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600),
-                        ),
-                        Image.asset(
-                          "assets/img/add.png",
-                          width: 12,
-                          height: 12,
-                          color: TColor.gray30,
-                        )
-                      ],
+                  child: GestureDetector(
+                    onTap: () {
+                      showAddCategoryDialog(context);
+                    },
+                    child: Container(
+                      height: 64,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Add new category ",
+                            style: TextStyle(
+                                color: TColor.gray30,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600),
+                          ),
+                          Image.asset(
+                            "assets/img/add.png",
+                            width: 12,
+                            height: 12,
+                            color: TColor.gray30,
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
