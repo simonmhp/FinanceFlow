@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:moneytracker/common_widget/round_budget_textfield.dart';
 import '../common/color_extension.dart';
-import 'package:intl/intl.dart'; // Import for currency formatting
+import 'package:intl/intl.dart';
+
+import '../view/sqflite/db_helper.dart'; // Import for currency formatting
 
 void showAddCategoryDialog(BuildContext context) {
   final TextEditingController budgetController = TextEditingController();
@@ -170,7 +172,7 @@ void showAddCategoryDialog(BuildContext context) {
           ),
           TextButton(
             child: Text('Add', style: TextStyle(color: Colors.green.shade300)),
-            onPressed: () {
+            onPressed: () async {
               // Validate and save the data
               if (selectedCategory != null &&
                   budgetController.text.isNotEmpty &&
@@ -189,11 +191,14 @@ void showAddCategoryDialog(BuildContext context) {
 
                 // Call your insert method here
                 // DatabaseHelper().insertBudget(budgetData);
+                final dbHelper =
+                    DatabaseHelper(); // Instantiate your DatabaseHelper
+                await dbHelper.insertBudget(budgetData);
 
                 Navigator.of(context).pop(); // Close the dialog
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Please fill all fields')),
+                  const SnackBar(content: Text('Please fill all fields')),
                 );
               }
             },
