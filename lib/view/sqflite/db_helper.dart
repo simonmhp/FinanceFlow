@@ -122,6 +122,25 @@ class DatabaseHelper {
     return result.isNotEmpty ? result.first['maxAmount'] ?? 0.0 : 0.0;
   }
 
+  Future<double> getMonthTotal() async {
+    final db = await database;
+
+    // Get the current year and month
+    final DateTime now = DateTime.now();
+    final int year = now.year;
+    final int month = now.month;
+
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT MAX(amount) AS maxAmount
+    FROM transactions
+    WHERE strftime('%Y', date) = ? 
+      AND strftime('%m', date) = ?
+  ''', ['$year', '$month']); // Bind year and month as parameters
+
+    // Check if the result is not empty and return the max amount or 0
+    return result.isNotEmpty ? result.first['maxAmount'] ?? 0.0 : 0.0;
+  }
+
   Future<double> getMonthLowestExpense() async {
     final db = await database;
 
@@ -142,7 +161,7 @@ class DatabaseHelper {
     return result.isNotEmpty ? result.first['maxAmount'] ?? 0.0 : 0.0;
   }
 
-  Future<double> getMonthCreditTotalExpense() async {
+  Future<double> getMonthDebitTotalExpense() async {
     final db = await database;
 
     // Get the current year and month

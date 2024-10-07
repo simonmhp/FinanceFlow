@@ -24,6 +24,38 @@ class _HomeViewState extends State<HomeView> {
   double highestExpense = 0.0;
   double lowestExpense = 0.0;
   double monthTotalExpense = 0.0; // Variable to hold the highest expense
+  double monthTotal = 0.0;
+  double percentage = 0.0;
+  double arcEndValue = 0.0;
+
+  Color getCategoryColor() {
+    if (percentage <= 20) {
+      return Colors.green;
+    } else if (percentage <= 40) {
+      return Colors.green[800]!; // Dark Green
+    } else if (percentage <= 60) {
+      return Colors.orange;
+    } else if (percentage <= 80) {
+      return Colors.red[200]!; // Light Red
+    } else {
+      return Colors.red;
+    }
+  }
+
+  // Function to determine category based on percentage
+  String getCategory() {
+    if (percentage <= 20) {
+      return "Super Low";
+    } else if (percentage <= 40) {
+      return "Low";
+    } else if (percentage <= 60) {
+      return "Moderate";
+    } else if (percentage <= 80) {
+      return "High";
+    } else {
+      return "Very High";
+    }
+  }
 
   @override
   void initState() {
@@ -37,7 +69,12 @@ class _HomeViewState extends State<HomeView> {
     // Fetch highest expense for the current month
     highestExpense = await dbHelper.getMonthHighestExpense();
     lowestExpense = await dbHelper.getMonthLowestExpense();
-    monthTotalExpense = await dbHelper.getMonthCreditTotalExpense();
+    monthTotalExpense = await dbHelper.getMonthDebitTotalExpense();
+    monthTotal = await dbHelper.getMonthTotal();
+    percentage = (monthTotalExpense * 100) / monthTotal;
+    percentage = percentage > 100 ? 100 : percentage;
+    arcEndValue = (percentage * 270) / 100;
+    arcEndValue = arcEndValue.clamp(0, 270);
 
     if (isSubscription) {
       List<Map<String, dynamic>> data = await dbHelper
@@ -86,7 +123,7 @@ class _HomeViewState extends State<HomeView> {
                         width: media.width * 0.72,
                         height: media.width * 0.72,
                         child: CustomPaint(
-                          painter: CustomArcPainter(end: 220),
+                          painter: CustomArcPainter(end: arcEndValue),
                         ),
                       ),
                       Padding(
@@ -140,7 +177,9 @@ class _HomeViewState extends State<HomeView> {
                       ),
                       SizedBox(height: media.width * 0.07),
                       InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          // Handle the onTap action if needed
+                        },
                         child: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
@@ -151,11 +190,11 @@ class _HomeViewState extends State<HomeView> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
-                            "See your budget",
+                            getCategory(), // Use the category text
                             style: TextStyle(
-                              color: TColor.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                              color: getCategoryColor(), // Use category color
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
@@ -339,78 +378,4 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
   }
-
-  // String formatIndianCurrency(double amount) {
-  //   // Convert the amount to an integer
-  //   int wholeAmount = amount.toInt();
-
-  //   // Convert to string and add ₹ symbol
-  //   String amountStr = '₹$wholeAmount';
-
-  //   // Split the string into whole and decimal parts
-  //   List<String> parts = amountStr.split('.');
-  //   String wholePart = parts[0];
-
-  //   // Apply Indian-style formatting
-  //   String formattedWholePart = '';
-  //   int length = wholePart.length;
-
-  //   // Insert commas for thousands, lakhs, and crores
-  //   for (int i = 0; i < length; i++) {
-  //     if (i > 0 && (length - i) % 3 == 0 && (length - i) != 3) {
-  //       formattedWholePart += ',';
-  //     }
-  //     formattedWholePart += wholePart[i];
-  //   }
-
-  //   return formattedWholePart;
-  // }
-
-  // String formatIndianCurrency(double amount) {
-  //   // Convert the amount to an integer
-  //   int wholeAmount = amount.toInt();
-
-  //   // Handle crore and lakh cases
-  //   if (wholeAmount >= 10000000) {
-  //     // 1 crore
-  //     double inCrores = wholeAmount / 10000000;
-  //     return '₹${inCrores.toStringAsFixed(2).replaceAll('.00', '')}Cr'; // Remove .00 if it's a whole number
-  //   } else if (wholeAmount >= 100000) {
-  //     // 1 lakh
-  //     double inLakhs = wholeAmount / 100000;
-  //     return '₹${inLakhs.toStringAsFixed(2).replaceAll('.00', '')}L'; // Remove .00 if it's a whole number
-  //   } else {
-  //     // Convert to string and add ₹ symbol
-  //     String amountStr = wholeAmount.toString();
-
-  //     // Apply Indian-style formatting for thousands
-  //     String formattedWholePart;
-
-  //     if (amountStr.length > 3) {
-  //       // Get last three digits
-  //       String lastThreeDigits = amountStr.substring(amountStr.length - 3);
-  //       String remainingDigits = amountStr.substring(0, amountStr.length - 3);
-
-  //       // Add commas in the remaining digits
-  //       if (remainingDigits.isNotEmpty) {
-  //         formattedWholePart = remainingDigits.replaceAllMapped(
-  //                 RegExp(r'(?<=\d)(?=(\d{2})+(?!\d))'), (Match m) => ',') +
-  //             ',' +
-  //             lastThreeDigits;
-  //       } else {
-  //         formattedWholePart = lastThreeDigits; // No remaining digits
-  //       }
-  //     } else {
-  //       formattedWholePart = amountStr; // Less than 1000, no formatting needed
-  //     }
-
-  //     return '₹$formattedWholePart'; // Return the formatted amount
-  //   }
-  // }
-
-  // int _getDaysInCurrentMonth() {
-  //   final now = DateTime.now();
-  //   // Using the next month's first day minus one day
-  //   return DateTime(now.year, now.month + 1, 0).day;
-  // }
 }
