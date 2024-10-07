@@ -16,9 +16,11 @@ class AddSubScriptionView extends StatefulWidget {
 
 class _AddSubScriptionViewState extends State<AddSubScriptionView> {
   final TextEditingController txtDescription = TextEditingController();
+  late TextEditingController
+      _amountController; // Declare a persistent controller for amount
   String? selectedTransactionType;
-  String? selectedCategory; // For storing selected category
-  String? selectedCategoryImg; // For storing selected category image URL
+  String? selectedCategory;
+  String? selectedCategoryImg;
 
   final List<Map<String, String>> subCategories = [
     {"name": "Salary", "icon": "assets/add_icons/salary.png"},
@@ -35,10 +37,30 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
     {"name": "Others", "icon": "assets/add_icons/application.png"},
   ];
 
+  double amountVal = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the amount controller with the current amount value
+    _amountController =
+        TextEditingController(text: amountVal.toStringAsFixed(0));
+  }
+
+  @override
+  void dispose() {
+    // Dispose controllers to free up resources
+    txtDescription.dispose();
+    _amountController.dispose();
+    super.dispose();
+  }
+
   Future<void> _addTransaction(BuildContext context) async {
-    if (selectedCategory != null && selectedTransactionType != null) {
+    if (selectedCategory != null &&
+        selectedTransactionType != null &&
+        amountVal != 0 &&
+        txtDescription.text.isNotEmpty) {
       try {
-        // Prepare the transaction data
         final transactionData = {
           'description': txtDescription.text,
           'transaction_type': selectedTransactionType,
@@ -48,16 +70,14 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
           'categoryImg': selectedCategoryImg,
         };
 
-        // Insert the transaction using DatabaseHelper
         final dbHelper = DatabaseHelper();
         int id = await dbHelper.insertTransaction(transactionData);
 
-        // Check if the insertion was successful
         if (id > 0) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Transaction added successfully!')),
+            const SnackBar(content: Text('Transaction added successfully!')),
           );
-          Navigator.pop(context); // Optionally navigate back after success
+          Navigator.pop(context);
         } else {
           throw Exception("Transaction failed to insert");
         }
@@ -68,13 +88,12 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text("Please select a category and transaction type.")),
+        const SnackBar(content: Text("Please select and Insert all Fields.")),
       );
     }
   }
 
-  double amountVal = 0.0; // Use double for financial amounts
+  // double amountVal = 0.0; // Use double for financial amounts
 
   @override
   Widget build(BuildContext context) {
@@ -176,37 +195,65 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
         itemCount: subCategories.length,
         itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
           var category = subCategories[itemIndex];
+          bool isSelected = selectedCategory ==
+              category["name"]; // Check if this category is selected
+
           return GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedCategory = category["name"];
-                selectedCategoryImg = category["icon"];
-              });
-            },
-            child: Container(
-              margin: const EdgeInsets.all(10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    category["icon"]!,
-                    width: media.width * 0.4,
-                    height: media.width * 0.4,
-                    fit: BoxFit.fitHeight,
-                  ),
-                  const Spacer(),
-                  Text(
-                    category["name"]!,
-                    style: TextStyle(
-                      color: TColor.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+              onTap: () {
+                setState(() {
+                  selectedCategory = category["name"];
+                  selectedCategoryImg = category["icon"];
+                });
+              },
+              child: TweenAnimationBuilder(
+                tween: ColorTween(
+                  begin: Colors.transparent,
+                  end: isSelected
+                      ? Colors.blue.withOpacity(0.2)
+                      : Colors.transparent,
+                ),
+                duration: const Duration(milliseconds: 300),
+                builder: (context, color, child) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedCategory = category["name"];
+                        selectedCategoryImg = category["icon"];
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 25.0, right: 25.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              category["icon"]!,
+                              width: media.width * 0.4,
+                              height: media.width * 0.4,
+                              fit: BoxFit.fitHeight,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              category["name"]!,
+                              style: TextStyle(
+                                color: TColor.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          );
+                  );
+                },
+              ));
         },
       ),
     );
@@ -253,6 +300,8 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
                 if (amountVal < 0) {
                   amountVal = 0;
                 }
+                _amountController.text =
+                    amountVal.toStringAsFixed(0); // Update controller
               });
             },
           ),
@@ -260,7 +309,7 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
             child: Column(
               children: [
                 Text(
-                  "Monthly price",
+                  "Amount",
                   style: TextStyle(
                     color: TColor.gray40,
                     fontSize: 12,
@@ -284,8 +333,8 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
                         fontWeight: FontWeight.w700,
                       ),
                       textAlign: TextAlign.center,
-                      controller: TextEditingController(
-                          text: amountVal.toStringAsFixed(0)),
+                      controller:
+                          _amountController, // Use the persistent controller
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         prefixText: "₹",
@@ -311,6 +360,8 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
             onPressed: () {
               setState(() {
                 amountVal += 1;
+                _amountController.text =
+                    amountVal.toStringAsFixed(0); // Update controller
               });
             },
           ),
