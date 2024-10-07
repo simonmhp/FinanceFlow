@@ -10,7 +10,12 @@ void showAddCategoryDialog(BuildContext context) {
   String? selectedCategory;
   String? selectedMonth;
 
-  List<String> categories = ['Food', 'Transport', 'Utilities', 'Entertainment'];
+  List<String> categories = [
+    'Food',
+    'Transportation',
+    'Entertainment',
+    'Miscellaneous'
+  ];
   List<String> months = [
     'JAN',
     'FEB',

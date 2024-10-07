@@ -69,7 +69,7 @@ class _HomeViewState extends State<HomeView> {
     // Fetch highest expense for the current month
     highestExpense = await dbHelper.getMonthHighestExpense();
     lowestExpense = await dbHelper.getMonthLowestExpense();
-    monthTotalExpense = await dbHelper.getMonthDebitTotalExpense();
+    monthTotalExpense = await dbHelper.getMonthTotalExpense();
     monthTotal = await dbHelper.getMonthTotal();
     percentage = (monthTotalExpense * 100) / monthTotal;
     percentage = percentage > 100 ? 100 : percentage;
@@ -77,14 +77,13 @@ class _HomeViewState extends State<HomeView> {
     arcEndValue = arcEndValue.clamp(0, 270);
 
     if (isSubscription) {
-      List<Map<String, dynamic>> data = await dbHelper
-          .getHomeTransactions(); // Fetch Debit Transactions (Expenses)
+      List<Map<String, dynamic>> data = await dbHelper.getHomeTransactions();
       setState(() {
         transactionData = data;
       });
     } else {
       List<Map<String, dynamic>> creditData = await dbHelper
-          .getCreditTransactionsForCurrentMonth(); // Fetch Credit Transactions
+          .getIncomeForCurrentMonth(); // Fetch Credit Transactions
       setState(() {
         transactionData = creditData;
       });
@@ -259,7 +258,7 @@ class _HomeViewState extends State<HomeView> {
                 children: [
                   Expanded(
                     child: SegmentButton(
-                      title: "Expense Category",
+                      title: "Expense",
                       isActive: isSubscription,
                       onPressed: () {
                         setState(() {
@@ -271,7 +270,7 @@ class _HomeViewState extends State<HomeView> {
                   ),
                   Expanded(
                     child: SegmentButton(
-                      title: "Credit",
+                      title: "Income",
                       isActive: !isSubscription,
                       onPressed: () {
                         setState(() {

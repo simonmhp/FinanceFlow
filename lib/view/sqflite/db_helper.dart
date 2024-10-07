@@ -103,9 +103,9 @@ class DatabaseHelper {
     final db = await database;
 
     final List<Map<String, dynamic>> result = await db.rawQuery('''
-    SELECT category, categoryImg, SUM(CASE WHEN transaction_type = 'Debit' THEN amount ELSE 0 END) as amount
+    SELECT category, categoryImg, SUM(CASE WHEN transaction_type = 'Expense' THEN amount ELSE 0 END) as amount
     FROM transactions
-    WHERE transaction_type = 'Debit'
+    WHERE transaction_type = 'Expense'
     GROUP BY category, categoryImg
   ''');
 
@@ -123,7 +123,7 @@ class DatabaseHelper {
     final List<Map<String, dynamic>> result = await db.rawQuery('''
     SELECT MAX(amount) AS maxAmount
     FROM transactions
-    WHERE transaction_type = 'Debit'
+    WHERE transaction_type = 'Expense'
       AND strftime('%Y', date) = ? 
       AND strftime('%m', date) = ?
   ''', ['$year', '$month']); // Bind year and month as parameters
@@ -162,7 +162,7 @@ class DatabaseHelper {
     final List<Map<String, dynamic>> result = await db.rawQuery('''
     SELECT MIN(amount) AS maxAmount
     FROM transactions
-    WHERE transaction_type = 'Debit'
+    WHERE transaction_type = 'Expense'
       AND strftime('%Y', date) = ? 
       AND strftime('%m', date) = ?
   ''', ['$year', '$month']); // Bind year and month as parameters
@@ -171,7 +171,7 @@ class DatabaseHelper {
     return result.isNotEmpty ? result.first['maxAmount'] ?? 0.0 : 0.0;
   }
 
-  Future<double> getMonthDebitTotalExpense() async {
+  Future<double> getMonthTotalExpense() async {
     final db = await database;
 
     // Get the current year and month
@@ -182,7 +182,7 @@ class DatabaseHelper {
     final List<Map<String, dynamic>> result = await db.rawQuery('''
     SELECT SUM(amount) AS maxAmount
     FROM transactions
-    WHERE transaction_type = 'Debit'
+    WHERE transaction_type = 'Expense'
       AND strftime('%Y', date) = ? 
       AND strftime('%m', date) = ?
   ''', ['$year', '$month']); // Bind year and month as parameters
@@ -191,8 +191,7 @@ class DatabaseHelper {
     return result.isNotEmpty ? result.first['maxAmount'] ?? 0.0 : 0.0;
   }
 
-  Future<List<Map<String, dynamic>>>
-      getCreditTransactionsForCurrentMonth() async {
+  Future<List<Map<String, dynamic>>> getIncomeForCurrentMonth() async {
     final db = await database;
 
     final currentMonth = DateTime.now().month;
@@ -201,7 +200,7 @@ class DatabaseHelper {
     final List<Map<String, dynamic>> result = await db.rawQuery('''
     SELECT description, amount, date
     FROM transactions
-    WHERE transaction_type = 'Credit'
+    WHERE transaction_type = 'Income'
     AND strftime('%m', date) = ? 
     AND strftime('%Y', date) = ?
   ''', [currentMonth.toString().padLeft(2, '0'), currentYear.toString()]);
@@ -255,7 +254,26 @@ class DatabaseHelper {
   // Insert a budget into the database
   Future<int> insertBudget(Map<String, dynamic> budget) async {
     final db = await database;
-    return await db.insert('budget', budget);
+
+    // Check if the budget entry already exists
+    var existingEntry = await db.query(
+      'budget',
+      where: 'category = ? AND month = ?',
+      whereArgs: [budget['category'], budget['month']],
+    );
+
+    if (existingEntry.isNotEmpty) {
+      // If it exists, update the existing entry
+      return await db.update(
+        'budget',
+        budget,
+        where: 'category = ? AND month = ?',
+        whereArgs: [budget['category'], budget['month']],
+      );
+    } else {
+      // If it doesn't exist, insert a new entry
+      return await db.insert('budget', budget);
+    }
   }
 
 // Fetch all budgets
@@ -289,5 +307,35 @@ class DatabaseHelper {
   Future<void> truncateBudgets() async {
     final db = await database;
     await db.delete('budget'); // This effectively truncates the table
+  }
+
+  Future<List<Map<String, dynamic>>> getBudgetsForMonth(String month) async {
+    final db = await database;
+    // Fetch budgets where month matches the current month
+    List<Map<String, dynamic>> budgets = await db.query(
+      'budget',
+      where: 'month = ?',
+      whereArgs: [month],
+    );
+    return budgets;
+  }
+
+  // Fetch all transactions for the current month
+  Future<List<Map<String, dynamic>>> getTransactionsForMonth() async {
+    final db = await database;
+
+    final int currentMonth = DateTime.now().month;
+    final int currentYear = DateTime.now().year;
+
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+  SELECT t.* 
+  FROM transactions t
+  JOIN budget b ON t.category = b.category
+  WHERE strftime('%m', t.date) = ? 
+    AND strftime('%Y', t.date) = ?
+    AND t.transaction_type = 'Expense'  -- Ensure that the transaction type is 'Expense'
+  ''', [currentMonth.toString().padLeft(2, '0'), currentYear.toString()]);
+
+    return result;
   }
 }

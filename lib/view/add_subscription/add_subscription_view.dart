@@ -228,7 +228,7 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
       padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
       child: RoundDropdown(
         title: "Transaction Type",
-        items: const ["Credit", "Debit"],
+        items: const ["Income", "Expense"],
         selectedValue: selectedTransactionType,
         onChanged: (String? newValue) {
           setState(() {
