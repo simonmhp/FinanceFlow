@@ -2,8 +2,12 @@ import 'dart:math';
 
 import 'package:calendar_agenda/calendar_agenda.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:moneytracker/common/color_extension.dart';
+import 'package:moneytracker/common_widget/day_transactions.dart';
+import 'package:moneytracker/view/home/helper.dart';
 import 'package:moneytracker/view/settings/settings_view.dart';
+import 'package:moneytracker/view/sqflite/db_helper.dart';
 
 import '../../common_widget/subscription_cell.dart';
 
@@ -18,28 +22,44 @@ class _CalenderViewState extends State<CalenderView> {
   CalendarAgendaController calendarAgendaControllerNotAppBar =
       CalendarAgendaController();
   late DateTime selectedDateNotAppBBar;
+  List<Map<String, dynamic>> transactionData = [];
+  String dayTotalExpense = "";
 
-  Random random = new Random();
-
-  List subArr = [
-    {"name": "Spotify", "icon": "assets/img/spotify_logo.png", "price": "5.99"},
-    {
-      "name": "YouTube Premium",
-      "icon": "assets/img/youtube_logo.png",
-      "price": "18.99"
-    },
-    {
-      "name": "Microsoft OneDrive",
-      "icon": "assets/img/onedrive_logo.png",
-      "price": "29.99"
-    },
-    {"name": "NetFlix", "icon": "assets/img/netflix_logo.png", "price": "15.00"}
-  ];
+  Random random = Random();
 
   @override
   void initState() {
     super.initState();
     selectedDateNotAppBBar = DateTime.now();
+    _fetchTransactionData();
+  }
+
+  Future<void> _fetchTransactionData() async {
+    DatabaseHelper dbHelper = DatabaseHelper();
+
+    // Format selected date to "yyyy-MM-dd"
+    String formattedDate =
+        DateFormat('yyyy-MM-dd').format(selectedDateNotAppBBar);
+
+    // Pass the formatted date to the database method to get transactions
+    List<Map<String, dynamic>> data =
+        await dbHelper.getAllTransactionsForTheDaySelected(formattedDate);
+
+    // Update the transaction data
+    setState(() {
+      transactionData = data;
+    });
+
+    // Fetch the total expense for the selected day
+    double totalExpense = await dbHelper.getDateTotalExpense(formattedDate);
+
+    // Update the dayTotalExpense state
+    setState(() {
+      dayTotalExpense = HomeHelper.formatIndianCurrency(totalExpense);
+    });
+
+    // Refresh UI after fetching data
+    setState(() {});
   }
 
   @override
@@ -72,7 +92,7 @@ class _CalenderViewState extends State<CalenderView> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "Calender",
+                                    "Calendar",
                                     style: TextStyle(
                                         color: TColor.gray30, fontSize: 16),
                                   ),
@@ -102,7 +122,7 @@ class _CalenderViewState extends State<CalenderView> {
                             height: 20,
                           ),
                           Text(
-                            "Subs\nSchedule",
+                            "Transactions\nCalender",
                             style: TextStyle(
                                 color: TColor.white,
                                 fontSize: 40,
@@ -115,7 +135,7 @@ class _CalenderViewState extends State<CalenderView> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "3 subscription for today",
+                                "${transactionData.length} transaction for the day",
                                 style: TextStyle(
                                     color: TColor.gray30,
                                     fontSize: 14,
@@ -141,7 +161,8 @@ class _CalenderViewState extends State<CalenderView> {
                                   child: Row(
                                     children: [
                                       Text(
-                                        "January",
+                                        DateFormat('MMMM')
+                                            .format(selectedDateNotAppBBar),
                                         style: TextStyle(
                                             color: TColor.white,
                                             fontSize: 12,
@@ -181,6 +202,7 @@ class _CalenderViewState extends State<CalenderView> {
                       onDateSelected: (date) {
                         setState(() {
                           selectedDateNotAppBBar = date;
+                          _fetchTransactionData();
                         });
                       },
                       decoration: BoxDecoration(
@@ -226,14 +248,14 @@ class _CalenderViewState extends State<CalenderView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "January",
+                        DateFormat('MMMM').format(selectedDateNotAppBBar),
                         style: TextStyle(
                             color: TColor.white,
                             fontSize: 20,
                             fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        "\$24.98",
+                        dayTotalExpense.toString(),
                         style: TextStyle(
                             color: TColor.white,
                             fontSize: 20,
@@ -245,14 +267,14 @@ class _CalenderViewState extends State<CalenderView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "01.08.2023",
+                        DateFormat('dd-MM-yyyy').format(selectedDateNotAppBBar),
                         style: TextStyle(
                             color: TColor.gray30,
                             fontSize: 12,
                             fontWeight: FontWeight.w500),
                       ),
                       Text(
-                        "in upcoming bills",
+                        "Day Expenditure",
                         style: TextStyle(
                             color: TColor.gray30,
                             fontSize: 12,
@@ -263,24 +285,65 @@ class _CalenderViewState extends State<CalenderView> {
                 ],
               ),
             ),
-            GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                    childAspectRatio: 1),
-                itemCount: subArr.length,
-                itemBuilder: (context, index) {
-                  var sObj = subArr[index] as Map? ?? {};
-
-                  return SubScriptionCell(
-                    sObj: sObj,
-                    onPressed: () {},
-                  );
-                }),
+            // Conditional rendering of transaction data
+            transactionData.isNotEmpty
+                ? ListView.builder(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: transactionData.length,
+                    itemBuilder: (context, index) {
+                      var transaction = transactionData[index];
+                      return DayTransactions(
+                        sObj: {
+                          "transaction_type": transaction['transaction_type'],
+                          "name":
+                              transaction['description'], // Use category column
+                          "icon":
+                              transaction['categoryImg'], // Use category image
+                          "price": HomeHelper.formatIndianCurrency(
+                                  transaction['amount'])
+                              .toString(), // Use the amount
+                        },
+                        onPressed: () {
+                          // Handle row press
+                        },
+                      );
+                    },
+                  )
+                : Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 8),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {},
+                        child: Container(
+                          height: 64,
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color: TColor.border.withOpacity(0.1)),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          alignment: Alignment.center,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "No transactions found for the selected date.",
+                                style: TextStyle(
+                                    color: TColor.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
             const SizedBox(
               height: 130,
             ),

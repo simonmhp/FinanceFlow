@@ -338,4 +338,41 @@ class DatabaseHelper {
 
     return result;
   }
+
+  // ******************* Calender View Methods *******************
+
+  Future<List<Map<String, dynamic>>> getAllTransactionsForTheDaySelected(
+      String selectedDate) async {
+    final db = await database;
+    // print("Fetching transactions for date: $selectedDate");
+
+    // Use the LIKE operator to match the selected date pattern
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT * 
+    FROM transactions 
+    WHERE date LIKE ? 
+  ''', ['$selectedDate%']); // Use % wildcard to match any additional characters
+
+    return result;
+  }
+
+Future<double> getDateTotalExpense(String selectedDate) async {
+  final db = await database;
+
+  // Use the LIKE operator to match the selected date pattern
+  final List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT SUM(amount) as TotalExpense 
+    FROM transactions 
+    WHERE transaction_type = 'Expense' AND date LIKE ? 
+  ''', ['$selectedDate%']); // Use % wildcard to match any additional characters
+
+  // Check if the result is not empty and return the total expense
+  if (result.isNotEmpty && result[0]['TotalExpense'] != null) {
+    return result[0]['TotalExpense'] as double;
+  }
+
+  // Return 0 if no expenses were found
+  return 0.0;
+}
+
 }

@@ -301,13 +301,13 @@ class _HomeViewState extends State<HomeView> {
                               .toString(), // Use the amount
                     },
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              SubscriptionInfoView(sObj: transaction),
-                        ),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) =>
+                      //         SubscriptionInfoView(sObj: transaction),
+                      //   ),
+                      // );
                     },
                   );
                 },

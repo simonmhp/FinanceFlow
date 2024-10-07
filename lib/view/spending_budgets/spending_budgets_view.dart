@@ -140,7 +140,7 @@ class _SpendingBudgetsViewState extends State<SpendingBudgetsView> {
     }
     double percentageSpent = (totalExpense / totalBudget) * 100;
 
-    print("else: " + percentageSpent.toString());
+    // print("else: " + percentageSpent.toString());
     if (percentageSpent <= 20) {
       return "Your budget is Excellent!👍 ${percentageSpent.toStringAsFixed(2)}%";
     } else if (percentageSpent <= 50) {
