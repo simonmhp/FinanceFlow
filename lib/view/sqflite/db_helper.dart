@@ -2,6 +2,56 @@ import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+class Transaction {
+  final int id;
+  final String description;
+  final String transactionType; // Renamed for consistency
+  final double amount;
+  final String date;
+  final String category;
+  final String categoryImg;
+  final int isSynced;
+
+  Transaction({
+    required this.id,
+    required this.description,
+    required this.transactionType,
+    required this.amount,
+    required this.date,
+    required this.category,
+    required this.categoryImg,
+    required this.isSynced,
+  });
+
+  // Factory constructor to create a Transaction from a Map
+  factory Transaction.fromMap(Map<String, dynamic> map) {
+    return Transaction(
+      id: map['id'],
+      description: map['description'],
+      transactionType: map['transaction_type'],
+      amount: map['amount'],
+      date: map['date'],
+      category: map['category'],
+      categoryImg: map['categoryImg'],
+      isSynced: map['isSynced'],
+    );
+  }
+
+  // Method to convert a Transaction object to a Map
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'description': description,
+      'transaction_type': transactionType,
+      'amount': amount,
+      'date': date,
+      'category': category,
+      'categoryImg': categoryImg,
+      'isSynced': isSynced,
+    };
+  }
+}
+
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
 
@@ -55,7 +105,8 @@ class DatabaseHelper {
         amount REAL NOT NULL,
         date TEXT NOT NULL,
         category TEXT NOT NULL,
-        categoryImg TEXT NOT NULL
+        categoryImg TEXT NOT NULL,
+        isSynced INTEGER NOT NULL DEFAULT 0  -- 0 = Not synced, 1 = Synced
       )
     ''');
 
@@ -417,5 +468,69 @@ class DatabaseHelper {
 
     // Check if the deletion was successful
     return result > 0; // If one or more rows were deleted, return true
+  }
+
+  // ******************* Settings  Methods *******************
+
+  // Method to update the username where email matches
+  Future<int> updateUsername(String newUsername, String email) async {
+    final db = await database;
+
+    // Ensure database is not null
+    if (db == null) return 0;
+
+    // Update the username where the email matches
+    return await db.update(
+      'users', // The table name
+      {'username': newUsername}, // The values to update (new username)
+      where: 'email = ?', // The condition to match the email
+      whereArgs: [email], // The argument to bind to the condition
+    );
+  }
+
+  Future<int> countUnsyncedTransactions() async {
+    final db = await database;
+
+    // Count transactions where isSynced = 0
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT COUNT(*) as count 
+    FROM transactions 
+    WHERE isSynced = 0
+  ''');
+
+    // Return the count or 0 if no result is found
+    return result.isNotEmpty ? result.first['count'] as int : 0;
+  }
+
+  Future<List<Transaction>> getUnsyncedTransactions() async {
+    final db = await database;
+
+    // Fetch transactions where isSynced = 0 using rawQuery
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+    SELECT * FROM transactions WHERE isSynced = 0
+  ''');
+
+    // Convert the list of maps into a list of Transaction objects
+    return List.generate(maps.length, (i) {
+      return Transaction.fromMap(maps[i]);
+    });
+  }
+
+  // Update the sync status of a transaction
+  Future<int> updateTransactionSyncStatus(
+      int transactionId, bool isSynced) async {
+    final db = await database;
+
+    // Convert the boolean to integer (0 for false, 1 for true)
+    int syncValue = isSynced ? 1 : 0;
+
+    // Update the transaction's sync status using rawQuery
+    final result = await db.rawUpdate('''
+    UPDATE transactions 
+    SET isSynced = ? 
+    WHERE id = ?
+  ''', [syncValue, transactionId]);
+
+    return result; // This returns the number of rows affected
   }
 }

@@ -41,48 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDQJ-dAe9y8R2yuAD_5kmF2duZaHJ-eEQw',
-    appId: '1:744875365999:web:5ee583a491e3d4d0041f9a',
-    messagingSenderId: '744875365999',
-    projectId: 'moneytracker-6affa',
-    authDomain: 'moneytracker-6affa.firebaseapp.com',
-    storageBucket: 'moneytracker-6affa.appspot.com',
-    measurementId: 'G-NNQS6Y14TX',
+    apiKey: 'AIzaSyCKTAWEuz1EB7E6uEj7LmRqBSSFmjDRHfk',
+    appId: '1:1053941365696:web:f63e0703568597ddfc2625',
+    messagingSenderId: '1053941365696',
+    projectId: 'financeflow-378d7',
+    authDomain: 'financeflow-378d7.firebaseapp.com',
+    storageBucket: 'financeflow-378d7.appspot.com',
+    measurementId: 'G-H14G1NT5EY',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDYEh3XuPwnz5Z8lkSO_UTuxGYaW_-1ylU',
-    appId: '1:744875365999:android:c875d793d1128569041f9a',
-    messagingSenderId: '744875365999',
-    projectId: 'moneytracker-6affa',
-    storageBucket: 'moneytracker-6affa.appspot.com',
+    apiKey: 'AIzaSyA1OqjhcopCuF3daFdA6gQ5cgway8-NZ9s',
+    appId: '1:1053941365696:android:c352e2818308b1d3fc2625',
+    messagingSenderId: '1053941365696',
+    projectId: 'financeflow-378d7',
+    storageBucket: 'financeflow-378d7.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDF2lve2HuqS-F2CAO78VrFR4XiPxz9Iwk',
-    appId: '1:744875365999:ios:ba6892a7b8928ea8041f9a',
-    messagingSenderId: '744875365999',
-    projectId: 'moneytracker-6affa',
-    storageBucket: 'moneytracker-6affa.appspot.com',
-    iosBundleId: 'com.example.myfinance',
+    apiKey: 'AIzaSyBN6a29X1A46PofoE6hH6lIIlwp7GIqFa8',
+    appId: '1:1053941365696:ios:4f6220f9b6fcc538fc2625',
+    messagingSenderId: '1053941365696',
+    projectId: 'financeflow-378d7',
+    storageBucket: 'financeflow-378d7.appspot.com',
+    iosBundleId: 'com.example.moneytracker',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDF2lve2HuqS-F2CAO78VrFR4XiPxz9Iwk',
-    appId: '1:744875365999:ios:ba6892a7b8928ea8041f9a',
-    messagingSenderId: '744875365999',
-    projectId: 'moneytracker-6affa',
-    storageBucket: 'moneytracker-6affa.appspot.com',
-    iosBundleId: 'com.example.myfinance',
+    apiKey: 'AIzaSyBN6a29X1A46PofoE6hH6lIIlwp7GIqFa8',
+    appId: '1:1053941365696:ios:4f6220f9b6fcc538fc2625',
+    messagingSenderId: '1053941365696',
+    projectId: 'financeflow-378d7',
+    storageBucket: 'financeflow-378d7.appspot.com',
+    iosBundleId: 'com.example.moneytracker',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDQJ-dAe9y8R2yuAD_5kmF2duZaHJ-eEQw',
-    appId: '1:744875365999:web:e8dc496d6e9ac8f1041f9a',
-    messagingSenderId: '744875365999',
-    projectId: 'moneytracker-6affa',
-    authDomain: 'moneytracker-6affa.firebaseapp.com',
-    storageBucket: 'moneytracker-6affa.appspot.com',
-    measurementId: 'G-J01WW2R4SH',
+    apiKey: 'AIzaSyCKTAWEuz1EB7E6uEj7LmRqBSSFmjDRHfk',
+    appId: '1:1053941365696:web:2cadc87f19e2ad6dfc2625',
+    messagingSenderId: '1053941365696',
+    projectId: 'financeflow-378d7',
+    authDomain: 'financeflow-378d7.firebaseapp.com',
+    storageBucket: 'financeflow-378d7.appspot.com',
+    measurementId: 'G-GHYEQJXESR',
   );
+
 }
