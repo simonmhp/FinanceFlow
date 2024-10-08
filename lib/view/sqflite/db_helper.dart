@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -374,5 +375,47 @@ class DatabaseHelper {
 
     // Return 0 if no expenses were found
     return 0.0;
+  }
+
+  // ******************* Expense Detail Card View Methods *******************
+
+// The function to get category expenses for the current month
+  Future<List<Map<String, dynamic>>> getMonthCategoryExpense(
+      String category) async {
+    final db = await database;
+
+    // Get the current month as a string
+    String currentMonth = DateFormat('MM').format(DateTime.now());
+    // Get the current year as well
+    String currentYear = DateFormat('yyyy').format(DateTime.now());
+
+    // Query the transactions table for the required data using rawQuery
+    List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT * 
+    FROM transactions
+    WHERE category = ? 
+      AND strftime('%m', date) = ? 
+      AND strftime('%Y', date) = ? 
+      AND transaction_type = ?
+  ''', [category, currentMonth, currentYear, 'Expense']);
+
+    // Return the list of matching transactions
+    return result;
+  }
+
+  // ******************* Expense Delete Dialog-Box Methods *******************
+
+  Future<bool> removeExpenseEntry(String date, String category) async {
+    final db = await database; // Your database instance
+
+    // Execute the delete query
+    final result = await db.delete(
+      'transactions',
+      where: 'date = ? AND transaction_type = ? ',
+      whereArgs: [date, category],
+    );
+
+    // Check if the deletion was successful
+    return result > 0; // If one or more rows were deleted, return true
   }
 }

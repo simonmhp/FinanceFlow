@@ -66,28 +66,20 @@ class _SettingsViewState extends State<SettingsView> {
               Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.start,
-                  //   children: [
-                  //     IconButton(
-                  //       onPressed: () {
-                  //         Navigator.pop(context);
-                  //       },
-                  //       icon: Image.asset(
-                  //         "assets/img/back.png",
-                  //         width: 25,
-                  //         height: 25,
-                  //         color: TColor.gray30,
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        "Settings",
-                        style: TextStyle(color: TColor.gray30, fontSize: 16),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 35.0, bottom: 15.0),
+                        child: Text(
+                          "Settings",
+                          style: TextStyle(
+                            color: TColor.gray30,
+                            fontSize: 16,
+                            fontFamily: 'assets/font/Inter-Medium.ttf',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),

@@ -96,29 +96,16 @@ class _CalenderViewState extends State<CalenderView> {
                                     child: Text(
                                       "Calendar",
                                       style: TextStyle(
-                                          color: TColor.gray30, fontSize: 16),
+                                        color: TColor.gray30,
+                                        fontSize: 16,
+                                        fontFamily:
+                                            'assets/font/Inter-Medium.ttf',
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                              // Row(
-                              //   children: [
-                              //     Spacer(),
-                              //     IconButton(
-                              //         onPressed: () {
-                              //           Navigator.push(
-                              //               context,
-                              //               MaterialPageRoute(
-                              //                   builder: (context) =>
-                              //                       const SettingsView()));
-                              //         },
-                              //         icon: Image.asset(
-                              //             "assets/img/settings.png",
-                              //             width: 25,
-                              //             height: 25,
-                              //             color: TColor.gray30))
-                              //   ],
-                              // )
                             ],
                           ),
                           const SizedBox(

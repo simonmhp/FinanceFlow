@@ -169,7 +169,12 @@ class _SpendingBudgetsViewState extends State<SpendingBudgetsView> {
                   padding: const EdgeInsets.only(top: 35.0, bottom: 15.0),
                   child: Text(
                     "Budget",
-                    style: TextStyle(color: TColor.gray30, fontSize: 16),
+                    style: TextStyle(
+                      color: TColor.gray30,
+                      fontSize: 16,
+                      fontFamily: 'assets/font/Inter-Medium.ttf',
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
