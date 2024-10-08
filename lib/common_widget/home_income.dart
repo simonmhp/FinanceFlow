@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
-
 import '../common/color_extension.dart';
+import 'package:intl/intl.dart'; // Import this for date formatting
 
-class SubScriptionHomeRow extends StatelessWidget {
+class HomeIncomeList extends StatelessWidget {
   final Map sObj;
   final VoidCallback onPressed;
 
-  const SubScriptionHomeRow(
+  const HomeIncomeList(
       {super.key, required this.sObj, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
+    // Get current date in dd format
+    String formattedDate = sObj['date'].substring(8, 10);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: InkWell(
@@ -28,10 +31,14 @@ class SubScriptionHomeRow extends StatelessWidget {
           alignment: Alignment.center,
           child: Row(
             children: [
-              Image.asset(
-                sObj["icon"],
-                width: 40,
-                height: 40,
+              // Replacing icon with date in 'dd' format
+              Text(
+                formattedDate,
+                style: TextStyle(
+                  color: TColor.secondaryG,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(
                 width: 8,
@@ -51,10 +58,10 @@ class SubScriptionHomeRow extends StatelessWidget {
               Text(
                 "${sObj["price"]}",
                 style: TextStyle(
-                    color: TColor.primaryText,
+                    color: Colors.green.shade200,
                     fontSize: 14,
                     fontWeight: FontWeight.w600),
-              )
+              ),
             ],
           ),
         ),

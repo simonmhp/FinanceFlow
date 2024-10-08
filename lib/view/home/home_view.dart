@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moneytracker/common/color_extension.dart';
+import 'package:moneytracker/common_widget/home_income.dart';
 import 'package:moneytracker/view/home/helper.dart';
 import 'package:moneytracker/view/sqflite/db_helper.dart';
 import '../../common_widget/custom_arc_painter.dart';
@@ -89,6 +90,18 @@ class _HomeViewState extends State<HomeView> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Text(
+                    "Home",
+                    style: TextStyle(color: TColor.gray30, fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
             Container(
               height: media.width * 1.1,
               decoration: BoxDecoration(
@@ -269,50 +282,60 @@ class _HomeViewState extends State<HomeView> {
                           },
                           onPressed: () {},
                         )
-                      : Container(
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: TColor.gray60.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                transaction['date'].substring(8, 10),
-                                style: TextStyle(
-                                  color: TColor.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16),
-                                  child: Text(
-                                    transaction['description'],
-                                    style: TextStyle(
-                                      color: TColor.white,
-                                      fontSize: 16,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                HomeHelper.formatIndianCurrency(
-                                    transaction['amount']),
-                                style: TextStyle(
-                                  color: TColor.primary5,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
+                      : HomeIncomeList(
+                          sObj: {
+                            "name": transaction['description'],
+                            "date": transaction['date'],
+                            "price": HomeHelper.formatIndianCurrency(
+                                    transaction['amount'])
+                                .toString(),
+                          },
+                          onPressed: () {},
                         );
+                  // : Container(
+                  //     margin: const EdgeInsets.symmetric(vertical: 8),
+                  //     padding: const EdgeInsets.all(16),
+                  //     decoration: BoxDecoration(
+                  //       color: TColor.gray60.withOpacity(0.5),
+                  //       borderRadius: BorderRadius.circular(8),
+                  //     ),
+                  //     child: Row(
+                  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //       children: [
+                  //         Text(
+                  //           transaction['date'].substring(8, 10),
+                  //           style: TextStyle(
+                  //             color: TColor.white,
+                  //             fontSize: 20,
+                  //             fontWeight: FontWeight.bold,
+                  //           ),
+                  //         ),
+                  //         Expanded(
+                  //           child: Padding(
+                  //             padding: const EdgeInsets.symmetric(
+                  //                 horizontal: 16),
+                  //             child: Text(
+                  //               transaction['description'],
+                  //               style: TextStyle(
+                  //                 color: TColor.white,
+                  //                 fontSize: 16,
+                  //               ),
+                  //               overflow: TextOverflow.ellipsis,
+                  //             ),
+                  //           ),
+                  //         ),
+                  //         Text(
+                  //           HomeHelper.formatIndianCurrency(
+                  //               transaction['amount']),
+                  //           style: TextStyle(
+                  //             color: TColor.primary5,
+                  //             fontSize: 16,
+                  //             fontWeight: FontWeight.w700,
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   );
                 },
               )
             else

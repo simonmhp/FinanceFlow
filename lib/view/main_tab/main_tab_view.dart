@@ -37,18 +37,6 @@ class _MainTabViewState extends State<MainTabView> {
         SafeArea(
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10.0),
-                    child: Text(
-                      "Home",
-                      style: TextStyle(color: TColor.gray30, fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
               const Spacer(),
               Padding(
                 padding:
@@ -123,7 +111,7 @@ class _MainTabViewState extends State<MainTabView> {
                                 });
                               },
                               icon: Image.asset(
-                                "assets/img/creditcards.png",
+                                "assets/img/settings.png",
                                 width: 20,
                                 height: 20,
                                 color: selectTab == 3
