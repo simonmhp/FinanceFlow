@@ -6,9 +6,6 @@ import '../../common_widget/custom_arc_painter.dart';
 import '../../common_widget/segment_button.dart';
 import '../../common_widget/status_button.dart';
 import '../../common_widget/subscription_home_row.dart';
-import '../../common_widget/upcoming_bill_row.dart';
-import '../settings/settings_view.dart';
-import '../subscription_info/subscription_info_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -18,84 +15,75 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  bool isSubscription = true; // True for Expense, False for Credit
-  List<Map<String, dynamic>> transactionData =
-      []; // To hold data from the transaction table
+  bool isSubscription = true; // True for Expense, False for Income
+  List<Map<String, dynamic>> transactionData = [];
   double highestExpense = 0.0;
   double lowestExpense = 0.0;
-  double monthTotalExpense = 0.0; // Variable to hold the highest expense
+  double monthTotalExpense = 0.0;
   double monthTotal = 0.0;
   double percentage = 0.0;
   double arcEndValue = 0.0;
+  bool isLoading = false;
 
   Color getCategoryColor() {
-    if (percentage <= 20) {
-      return Colors.green;
-    } else if (percentage <= 40) {
-      return Colors.green[800]!; // Dark Green
-    } else if (percentage <= 60) {
-      return Colors.orange;
-    } else if (percentage <= 80) {
-      return Colors.red[200]!; // Light Red
-    } else {
-      return Colors.red;
-    }
+    if (percentage <= 20) return Colors.green;
+    if (percentage <= 40) return Colors.green.shade800; // Dark Green
+    if (percentage <= 60) return Colors.orange;
+    if (percentage <= 80) return Colors.red.shade200; // Light Red
+    return Colors.red;
   }
 
-  // Function to determine category based on percentage
   String getCategory() {
-    if (percentage <= 20) {
-      return "Super Low";
-    } else if (percentage <= 40) {
-      return "Low";
-    } else if (percentage <= 60) {
-      return "Moderate";
-    } else if (percentage <= 80) {
-      return "High";
-    } else {
-      return "Very High";
-    }
+    if (percentage <= 20) return "Super Low";
+    if (percentage <= 40) return "Low";
+    if (percentage <= 60) return "Moderate";
+    if (percentage <= 80) return "High";
+    return "Very High";
   }
 
   @override
   void initState() {
     super.initState();
-    _fetchTransactionData(); // Fetch the data when the view is initialized
+    _fetchTransactionData();
   }
 
   Future<void> _fetchTransactionData() async {
-    DatabaseHelper dbHelper = DatabaseHelper();
+    setState(() {
+      isLoading = true;
+    });
 
-    // Fetch highest expense for the current month
+    final dbHelper = DatabaseHelper();
+
     highestExpense = await dbHelper.getMonthHighestExpense();
     lowestExpense = await dbHelper.getMonthLowestExpense();
     monthTotalExpense = await dbHelper.getMonthTotalExpense();
-    monthTotal = await dbHelper.getMonthTotal();
-    percentage = (monthTotalExpense * 100) / monthTotal;
-    percentage = percentage > 100 ? 100 : percentage;
+    monthTotal = await dbHelper.getMonthIncomeTotal();
+
+    percentage = (monthTotal == 0) ? 0 : (monthTotalExpense * 100) / monthTotal;
+    percentage = percentage.clamp(0, 100);
     arcEndValue = (percentage * 270) / 100;
-    arcEndValue = arcEndValue.clamp(0, 270);
 
-    if (isSubscription) {
-      List<Map<String, dynamic>> data = await dbHelper.getHomeTransactions();
-      setState(() {
-        transactionData = data;
-      });
-    } else {
-      List<Map<String, dynamic>> creditData = await dbHelper
-          .getIncomeForCurrentMonth(); // Fetch Credit Transactions
-      setState(() {
-        transactionData = creditData;
-      });
-    }
+    final data = await dbHelper.getHomeTransactions();
+    final creditData = await dbHelper.getIncomeForCurrentMonth();
 
-    // Refresh UI after fetching data
-    setState(() {});
+    setState(() {
+      transactionData = isSubscription ? data : creditData;
+      isLoading = false; // Set loading to false when data is loaded
+    });
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Text(
+        'No transactions available',
+        style: TextStyle(color: Colors.grey, fontSize: 16),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    var media = MediaQuery.sizeOf(context);
+    final media = MediaQuery.sizeOf(context);
     return Scaffold(
       backgroundColor: TColor.gray,
       body: SingleChildScrollView(
@@ -125,47 +113,21 @@ class _HomeViewState extends State<HomeView> {
                           painter: CustomArcPainter(end: arcEndValue),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: Row(
-                          children: [
-                            const Spacer(),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const SettingsView(),
-                                  ),
-                                );
-                              },
-                              icon: Image.asset(
-                                "assets/img/settings.png",
-                                width: 25,
-                                height: 25,
-                                color: TColor.gray30,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       SizedBox(height: media.width * 0.05),
-                      SizedBox(height: media.width * 0.07),
                       Text(
-                        HomeHelper.formatIndianCurrency(
-                            monthTotalExpense), // x Display the highest expense
+                        HomeHelper.formatIndianCurrency(monthTotalExpense),
                         style: TextStyle(
                           color: TColor.white,
                           fontSize: 40,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      SizedBox(height: media.width * 0.055),
+                      SizedBox(height: media.width * 0.07),
                       Text(
                         "This month's Expenses",
                         style: TextStyle(
@@ -177,7 +139,7 @@ class _HomeViewState extends State<HomeView> {
                       SizedBox(height: media.width * 0.07),
                       InkWell(
                         onTap: () {
-                          // Handle the onTap action if needed
+                          _fetchTransactionData();
                         },
                         child: Container(
                           padding: const EdgeInsets.all(8),
@@ -189,9 +151,9 @@ class _HomeViewState extends State<HomeView> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
-                            getCategory(), // Use the category text
+                            getCategory(),
                             style: TextStyle(
-                              color: getCategoryColor(), // Use category color
+                              color: getCategoryColor(),
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                             ),
@@ -211,7 +173,7 @@ class _HomeViewState extends State<HomeView> {
                               child: StatusButton(
                                 title: "Highest",
                                 value: HomeHelper.formatIndianCurrency(
-                                    highestExpense), // Update based on your logic
+                                    highestExpense),
                                 statusColor: TColor.secondary,
                                 onPressed: () {},
                               ),
@@ -220,10 +182,9 @@ class _HomeViewState extends State<HomeView> {
                             Expanded(
                               child: StatusButton(
                                 title: "Avg (per day)",
-                                value: (monthTotalExpense.toInt() /
+                                value: (monthTotalExpense /
                                         HomeHelper.getDaysInCurrentMonth())
-                                    .toStringAsFixed(
-                                        1), // Format to 2 decimal points
+                                    .toStringAsFixed(1),
                                 statusColor: TColor.primary10,
                                 onPressed: () {},
                               ),
@@ -233,7 +194,7 @@ class _HomeViewState extends State<HomeView> {
                               child: StatusButton(
                                 title: "Lowest",
                                 value: HomeHelper.formatIndianCurrency(
-                                    lowestExpense), // Update based on your logic
+                                    lowestExpense),
                                 statusColor: TColor.secondaryG,
                                 onPressed: () {},
                               ),
@@ -263,7 +224,7 @@ class _HomeViewState extends State<HomeView> {
                       onPressed: () {
                         setState(() {
                           isSubscription = true;
-                          _fetchTransactionData(); // Fetch expense data
+                          _fetchTransactionData();
                         });
                       },
                     ),
@@ -275,7 +236,7 @@ class _HomeViewState extends State<HomeView> {
                       onPressed: () {
                         setState(() {
                           isSubscription = false;
-                          _fetchTransactionData(); // Fetch credit data
+                          _fetchTransactionData();
                         });
                       },
                     ),
@@ -283,7 +244,12 @@ class _HomeViewState extends State<HomeView> {
                 ],
               ),
             ),
-            if (isSubscription)
+            // Show loading indicator when isLoading is true
+            if (isLoading)
+              const Center(
+                child: CircularProgressIndicator(),
+              )
+            else if (transactionData.isNotEmpty)
               ListView.builder(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
@@ -292,86 +258,66 @@ class _HomeViewState extends State<HomeView> {
                 itemCount: transactionData.length,
                 itemBuilder: (context, index) {
                   var transaction = transactionData[index];
-                  return SubScriptionHomeRow(
-                    sObj: {
-                      "name": transaction['category'], // Use category column
-                      "icon": transaction['categoryImg'], // Use category image
-                      "price":
-                          HomeHelper.formatIndianCurrency(transaction['amount'])
-                              .toString(), // Use the amount
-                    },
-                    onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) =>
-                      //         SubscriptionInfoView(sObj: transaction),
-                      //   ),
-                      // );
-                    },
-                  );
-                },
-              ),
-            if (!isSubscription)
-              ListView.builder(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: transactionData.length,
-                itemBuilder: (context, index) {
-                  var transaction = transactionData[index];
-                  return Container(
-                    margin: const EdgeInsets.symmetric(
-                        vertical: 8), // Margin for spacing
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: TColor.gray60.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          transaction['date'].substring(8,
-                              10), // Extracting day from date string (assuming format YYYY-MM-DD)
-                          style: TextStyle(
-                            color: TColor.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                  return isSubscription
+                      ? SubScriptionHomeRow(
+                          sObj: {
+                            "name": transaction['category'],
+                            "icon": transaction['categoryImg'],
+                            "price": HomeHelper.formatIndianCurrency(
+                                    transaction['amount'])
+                                .toString(),
+                          },
+                          onPressed: () {},
+                        )
+                      : Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: TColor.gray60.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              transaction[
-                                  'description'], // Display the description
-                              style: TextStyle(
-                                color: TColor.white,
-                                fontSize: 16,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                transaction['date'].substring(8, 10),
+                                style: TextStyle(
+                                  color: TColor.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  child: Text(
+                                    transaction['description'],
+                                    style: TextStyle(
+                                      color: TColor.white,
+                                      fontSize: 16,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                HomeHelper.formatIndianCurrency(
+                                    transaction['amount']),
+                                style: TextStyle(
+                                  color: TColor.primary5,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        Text(
-                          HomeHelper.formatIndianCurrency(
-                              transaction['amount']), // Display the amount
-                          style: TextStyle(
-                            color: TColor.primary5,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
+                        );
                 },
-              ),
-            const SizedBox(
-              height: 110,
-            ),
+              )
+            else
+              _buildEmptyState(),
+            const SizedBox(height: 110),
           ],
         ),
       ),

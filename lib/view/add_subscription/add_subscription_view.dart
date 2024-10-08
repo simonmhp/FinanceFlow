@@ -45,6 +45,7 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
     // Initialize the amount controller with the current amount value
     _amountController =
         TextEditingController(text: amountVal.toStringAsFixed(0));
+    print("omega:" + DateTime.now().toIso8601String());
   }
 
   @override

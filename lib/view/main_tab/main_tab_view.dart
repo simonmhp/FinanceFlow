@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:moneytracker/view/add_subscription/add_subscription_view.dart';
+import 'package:moneytracker/view/settings/settings_view.dart';
 
 import '../../common/color_extension.dart';
 import '../calender/calender_view.dart';
@@ -36,6 +37,18 @@ class _MainTabViewState extends State<MainTabView> {
         SafeArea(
           child: Column(
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
+                    child: Text(
+                      "Home",
+                      style: TextStyle(color: TColor.gray30, fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
               const Spacer(),
               Padding(
                 padding:
@@ -106,7 +119,7 @@ class _MainTabViewState extends State<MainTabView> {
                               onPressed: () {
                                 setState(() {
                                   selectTab = 3;
-                                  currentTabView = const CardsView();
+                                  currentTabView = const SettingsView();
                                 });
                               },
                               icon: Image.asset(

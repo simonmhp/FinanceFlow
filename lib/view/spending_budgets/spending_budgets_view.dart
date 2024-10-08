@@ -142,15 +142,15 @@ class _SpendingBudgetsViewState extends State<SpendingBudgetsView> {
 
     // print("else: " + percentageSpent.toString());
     if (percentageSpent <= 20) {
-      return "Your budget is Excellent!👍 ${percentageSpent.toStringAsFixed(2)}%";
+      return "Your budget is Excellent! \n${percentageSpent.toStringAsFixed(2)}% 👍";
     } else if (percentageSpent <= 50) {
-      return "Your budgets are on track!😊 ${percentageSpent.toStringAsFixed(2)}%";
+      return "Your budgets are on track! \n${percentageSpent.toStringAsFixed(2)}% 😊";
     } else if (percentageSpent <= 80) {
-      return "Your budget will be depleting soon!😳 ${percentageSpent.toStringAsFixed(2)}%";
+      return "Your budget will be depleting soon! \n${percentageSpent.toStringAsFixed(2)}% 😳";
     } else if (percentageSpent <= 99) {
-      return "Spend a little less!😒 ${percentageSpent.toStringAsFixed(2)}%";
+      return "Spend a little less! ${percentageSpent.toStringAsFixed(2)}% 😒";
     } else {
-      return "Your budgets depleted! 👎";
+      return "Your budgets depleted!👎";
     }
   }
 
@@ -162,26 +162,38 @@ class _SpendingBudgetsViewState extends State<SpendingBudgetsView> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 35, right: 10),
-              child: Row(
-                children: [
-                  const Spacer(),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SettingsView(),
-                        ),
-                      );
-                    },
-                    icon: Image.asset("assets/img/settings.png",
-                        width: 25, height: 25, color: TColor.gray30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 35.0, bottom: 15.0),
+                  child: Text(
+                    "Budget",
+                    style: TextStyle(color: TColor.gray30, fontSize: 16),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
+            // Padding(
+            //   padding: const EdgeInsets.only(top: 35, right: 10),
+            //   child: Row(
+            //     children: [
+            //       const Spacer(),
+            //       IconButton(
+            //         onPressed: () {
+            //           Navigator.push(
+            //             context,
+            //             MaterialPageRoute(
+            //               builder: (context) => const SettingsView(),
+            //             ),
+            //           );
+            //         },
+            //         icon: Image.asset("assets/img/settings.png",
+            //             width: 25, height: 25, color: TColor.gray30),
+            //       ),
+            //     ],
+            //   ),
+            // ),
             Stack(
               alignment: Alignment.bottomCenter,
               children: [
@@ -236,6 +248,7 @@ class _SpendingBudgetsViewState extends State<SpendingBudgetsView> {
                     children: [
                       Text(
                         getBudgetStatus(),
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                             color: TColor.white,
                             fontSize: 14,

@@ -91,31 +91,34 @@ class _CalenderViewState extends State<CalenderView> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    "Calendar",
-                                    style: TextStyle(
-                                        color: TColor.gray30, fontSize: 16),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10.0),
+                                    child: Text(
+                                      "Calendar",
+                                      style: TextStyle(
+                                          color: TColor.gray30, fontSize: 16),
+                                    ),
                                   ),
                                 ],
                               ),
-                              Row(
-                                children: [
-                                  Spacer(),
-                                  IconButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const SettingsView()));
-                                      },
-                                      icon: Image.asset(
-                                          "assets/img/settings.png",
-                                          width: 25,
-                                          height: 25,
-                                          color: TColor.gray30))
-                                ],
-                              )
+                              // Row(
+                              //   children: [
+                              //     Spacer(),
+                              //     IconButton(
+                              //         onPressed: () {
+                              //           Navigator.push(
+                              //               context,
+                              //               MaterialPageRoute(
+                              //                   builder: (context) =>
+                              //                       const SettingsView()));
+                              //         },
+                              //         icon: Image.asset(
+                              //             "assets/img/settings.png",
+                              //             width: 25,
+                              //             height: 25,
+                              //             color: TColor.gray30))
+                              //   ],
+                              // )
                             ],
                           ),
                           const SizedBox(

@@ -66,22 +66,22 @@ class _SettingsViewState extends State<SettingsView> {
               Stack(
                 alignment: Alignment.center,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Image.asset(
-                          "assets/img/back.png",
-                          width: 25,
-                          height: 25,
-                          color: TColor.gray30,
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.start,
+                  //   children: [
+                  //     IconButton(
+                  //       onPressed: () {
+                  //         Navigator.pop(context);
+                  //       },
+                  //       icon: Image.asset(
+                  //         "assets/img/back.png",
+                  //         width: 25,
+                  //         height: 25,
+                  //         color: TColor.gray30,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -203,46 +203,46 @@ class _SettingsViewState extends State<SettingsView> {
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20, bottom: 8),
-                      child: Text(
-                        "My subscription",
-                        style: TextStyle(
-                          color: TColor.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: TColor.border.withOpacity(0.1),
-                        ),
-                        color: TColor.gray60.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Column(
-                        children: [
-                          IconItemRow(
-                            title: "Sorting",
-                            icon: "assets/img/sorting.png",
-                            value: "Date",
-                          ),
-                          IconItemRow(
-                            title: "Summary",
-                            icon: "assets/img/chart.png",
-                            value: "Average",
-                          ),
-                          IconItemRow(
-                            title: "Default currency",
-                            icon: "assets/img/money.png",
-                            value: "USD (\$)",
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 20, bottom: 8),
+                    //   child: Text(
+                    //     "My subscription",
+                    //     style: TextStyle(
+                    //       color: TColor.white,
+                    //       fontSize: 14,
+                    //       fontWeight: FontWeight.w600,
+                    //     ),
+                    //   ),
+                    // ),
+                    // Container(
+                    //   padding: const EdgeInsets.symmetric(vertical: 8),
+                    //   decoration: BoxDecoration(
+                    //     border: Border.all(
+                    //       color: TColor.border.withOpacity(0.1),
+                    //     ),
+                    //     color: TColor.gray60.withOpacity(0.2),
+                    //     borderRadius: BorderRadius.circular(16),
+                    //   ),
+                    //   child: const Column(
+                    //     children: [
+                    //       IconItemRow(
+                    //         title: "Sorting",
+                    //         icon: "assets/img/sorting.png",
+                    //         value: "Date",
+                    //       ),
+                    //       IconItemRow(
+                    //         title: "Summary",
+                    //         icon: "assets/img/chart.png",
+                    //         value: "Average",
+                    //       ),
+                    //       IconItemRow(
+                    //         title: "Default currency",
+                    //         icon: "assets/img/money.png",
+                    //         value: "USD (\$)",
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                     Padding(
                       padding: const EdgeInsets.only(top: 20, bottom: 8),
                       child: Text(

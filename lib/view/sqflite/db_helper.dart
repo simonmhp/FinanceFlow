@@ -132,7 +132,7 @@ class DatabaseHelper {
     return result.isNotEmpty ? result.first['maxAmount'] ?? 0.0 : 0.0;
   }
 
-  Future<double> getMonthTotal() async {
+  Future<double> getMonthIncomeTotal() async {
     final db = await database;
 
     // Get the current year and month
@@ -141,9 +141,10 @@ class DatabaseHelper {
     final int month = now.month;
 
     final List<Map<String, dynamic>> result = await db.rawQuery('''
-    SELECT MAX(amount) AS maxAmount
+    SELECT SUM(amount) AS maxAmount
     FROM transactions
-    WHERE strftime('%Y', date) = ? 
+    WHERE transaction_type = 'Income' 
+      AND strftime('%Y', date) = ? 
       AND strftime('%m', date) = ?
   ''', ['$year', '$month']); // Bind year and month as parameters
 
@@ -356,23 +357,22 @@ class DatabaseHelper {
     return result;
   }
 
-Future<double> getDateTotalExpense(String selectedDate) async {
-  final db = await database;
+  Future<double> getDateTotalExpense(String selectedDate) async {
+    final db = await database;
 
-  // Use the LIKE operator to match the selected date pattern
-  final List<Map<String, dynamic>> result = await db.rawQuery('''
+    // Use the LIKE operator to match the selected date pattern
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
     SELECT SUM(amount) as TotalExpense 
     FROM transactions 
     WHERE transaction_type = 'Expense' AND date LIKE ? 
   ''', ['$selectedDate%']); // Use % wildcard to match any additional characters
 
-  // Check if the result is not empty and return the total expense
-  if (result.isNotEmpty && result[0]['TotalExpense'] != null) {
-    return result[0]['TotalExpense'] as double;
+    // Check if the result is not empty and return the total expense
+    if (result.isNotEmpty && result[0]['TotalExpense'] != null) {
+      return result[0]['TotalExpense'] as double;
+    }
+
+    // Return 0 if no expenses were found
+    return 0.0;
   }
-
-  // Return 0 if no expenses were found
-  return 0.0;
-}
-
 }

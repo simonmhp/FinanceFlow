@@ -45,8 +45,8 @@ class IconItemRow extends StatelessWidget {
           const SizedBox(
             width: 8,
           ),
-          Image.asset("assets/img/next.png",
-              width: 12, height: 12, color: TColor.gray30)
+          // Image.asset("assets/img/next.png",
+          //     width: 12, height: 12, color: TColor.gray30)
         ],
       ),
     );
