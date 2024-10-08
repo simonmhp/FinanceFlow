@@ -4,7 +4,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async'; // For the 3-second delay
 import 'package:moneytracker/view/login/sign_up_view.dart';
-import 'package:moneytracker/view/home/home_view.dart'; // Assuming HomeView is the page to navigate after successful login
 import 'package:moneytracker/view/main_tab/main_tab_view.dart';
 import 'package:moneytracker/view/sqflite/db_helper.dart';
 

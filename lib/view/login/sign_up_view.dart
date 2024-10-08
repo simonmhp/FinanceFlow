@@ -5,11 +5,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:moneytracker/common_widget/password_textfield.dart';
 import 'package:moneytracker/common_widget/secondary_boutton.dart';
 import 'package:moneytracker/view/login/sign_in_view.dart';
-import 'package:moneytracker/view/main_tab/main_tab_view.dart';
 import '../../common/color_extension.dart';
 import '../../common_widget/primary_button.dart';
 import '../../common_widget/round_textfield.dart';
-import 'package:moneytracker/view/sqflite/db_helper.dart'; // Import the SQLite helper
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -26,7 +24,6 @@ class _SignUpViewState extends State<SignUpView> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore =
       FirebaseFirestore.instance; // Firestore instance
-  final DatabaseHelper _databaseHelper = DatabaseHelper(); // SQLite Helper
 
   int passwordStrength = 0;
   bool isLoading = false; // Loading state

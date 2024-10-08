@@ -5,7 +5,6 @@ import 'package:moneytracker/common_widget/budgets_row.dart';
 import 'package:moneytracker/common_widget/custom_arc_180_painter.dart';
 import 'package:moneytracker/common_widget/show_add_category_dialog.dart';
 import 'package:moneytracker/view/sqflite/db_helper.dart';
-import '../settings/settings_view.dart';
 import 'package:intl/intl.dart';
 
 class SpendingBudgetsView extends StatefulWidget {

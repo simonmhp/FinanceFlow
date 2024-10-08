@@ -5,7 +5,6 @@ import 'package:moneytracker/view/settings/settings_view.dart';
 
 import '../../common/color_extension.dart';
 import '../calender/calender_view.dart';
-import '../card/cards_view.dart';
 import '../home/home_view.dart';
 import '../spending_budgets/spending_budgets_view.dart';
 
@@ -23,7 +22,6 @@ class _MainTabViewState extends State<MainTabView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
   }

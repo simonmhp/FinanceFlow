@@ -1,7 +1,7 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:moneytracker/common_widget/expense_card_transaction.dart';
-import 'package:moneytracker/common_widget/secondary_boutton.dart';
 import 'package:moneytracker/view/home/helper.dart';
 import 'package:moneytracker/view/sqflite/db_helper.dart';
 import 'package:moneytracker/view/subscription_info/delete_dialog.dart';
@@ -25,11 +25,14 @@ class _SubscriptionInfoViewState extends State<SubscriptionInfoView> {
   List<Map<String, dynamic>> transactionData = [];
   String dayTotalExpense = "";
   DatabaseHelper dbHelper = DatabaseHelper();
+  String formattedMonth = "";
 
   @override
   void initState() {
     super.initState();
 
+    DateTime parsedDate = DateTime.parse(widget.sObj['date']);
+    formattedMonth = DateFormat('MMMM').format(parsedDate);
     _fetchTransactionData();
   }
 
@@ -100,19 +103,19 @@ class _SubscriptionInfoViewState extends State<SubscriptionInfoView> {
                                     color: TColor.gray30),
                               ),
                               Text(
-                                "Subscription info",
+                                formattedMonth,
                                 style: TextStyle(
                                     color: TColor.gray30, fontSize: 16),
                               ),
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                icon: Image.asset("assets/img/Trash.png",
-                                    width: 25,
-                                    height: 25,
-                                    color: TColor.gray30),
-                              ),
+                              // IconButton(
+                              //   onPressed: () {
+                              //     Navigator.pop(context);
+                              //   },
+                              //   icon: Image.asset("assets/img/Trash.png",
+                              //       width: 25,
+                              //       height: 25,
+                              //       color: TColor.gray30),
+                              // ),
                             ],
                           ),
                           const Spacer(),
@@ -135,7 +138,7 @@ class _SubscriptionInfoViewState extends State<SubscriptionInfoView> {
                             height: 15,
                           ),
                           Text(
-                            "\$${widget.sObj["price"]}",
+                            "${widget.sObj["price"]}",
                             style: TextStyle(
                                 color: TColor.gray30,
                                 fontSize: 20,
@@ -214,7 +217,7 @@ class _SubscriptionInfoViewState extends State<SubscriptionInfoView> {
                           const SizedBox(
                             height: 20,
                           ),
-                          SecondaryButton(title: "Save", onPressed: () {})
+                          // SecondaryButton(title: "Save", onPressed: () {})
                         ],
                       ),
                     )

@@ -3,6 +3,7 @@ import 'package:moneytracker/common/color_extension.dart';
 import 'package:moneytracker/common_widget/home_income.dart';
 import 'package:moneytracker/view/home/helper.dart';
 import 'package:moneytracker/view/sqflite/db_helper.dart';
+import 'package:moneytracker/view/subscription_info/delete_dialog.dart';
 import 'package:moneytracker/view/subscription_info/subscription_info_view.dart';
 import '../../common_widget/custom_arc_painter.dart';
 import '../../common_widget/segment_button.dart';
@@ -26,6 +27,7 @@ class _HomeViewState extends State<HomeView> {
   double percentage = 0.0;
   double arcEndValue = 0.0;
   bool isLoading = false;
+  final dbHelper = DatabaseHelper();
 
   Color getCategoryColor() {
     if (percentage <= 20) return Colors.green;
@@ -54,8 +56,6 @@ class _HomeViewState extends State<HomeView> {
       isLoading = true;
     });
 
-    final dbHelper = DatabaseHelper();
-
     highestExpense = await dbHelper.getMonthHighestExpense();
     lowestExpense = await dbHelper.getMonthLowestExpense();
     monthTotalExpense = await dbHelper.getMonthTotalExpense();
@@ -70,12 +70,12 @@ class _HomeViewState extends State<HomeView> {
 
     setState(() {
       transactionData = isSubscription ? data : creditData;
-      isLoading = false; // Set loading to false when data is loaded
+      isLoading = false;
     });
   }
 
   Widget _buildEmptyState() {
-    return Center(
+    return const Center(
       child: Text(
         'No transactions available',
         style: TextStyle(color: Colors.grey, fontSize: 16),
@@ -294,7 +294,6 @@ class _HomeViewState extends State<HomeView> {
                                   .toString(),
                             },
                             onPressed: () {
-                              print("omega:" + isSubscription.toString());
                               if (isSubscription) {
                                 Navigator.push(
                                     context,
@@ -302,10 +301,10 @@ class _HomeViewState extends State<HomeView> {
                                         builder: (context) =>
                                             SubscriptionInfoView(
                                               sObj: {
+                                                "date": transaction['date'],
                                                 "icon":
                                                     transaction['categoryImg'],
                                                 "name": transaction['category'],
-                                                "date": transaction['date'],
                                                 "price": HomeHelper
                                                         .formatIndianCurrency(
                                                             transaction[
@@ -320,7 +319,7 @@ class _HomeViewState extends State<HomeView> {
                                                 });
                                               },
                                             )));
-                              } else {}
+                              }
                             }, // Optional, since we handle taps via InkWell
                           )
                         : HomeIncomeList(
@@ -332,27 +331,30 @@ class _HomeViewState extends State<HomeView> {
                                   .toString(),
                             },
                             onPressed: () {
-                              if (isSubscription) {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            SubscriptionInfoView(
-                                              sObj: const {
-                                                "icon": "",
-                                                "name": "food",
-                                                "price": "360",
-                                              },
-                                              onCallBack: () {
-                                                // Call setState or any function to refresh the parent widget
-                                                setState(() {
-                                                  _fetchTransactionData();
-                                                  // Refresh the state or reload the data
-                                                });
-                                              },
-                                            )));
-                              } else {}
-                            }, // Optional, since we handle taps via InkWell
+                              print("objectxxx:" + transaction.toString());
+                              // Show a dialog with income details and options
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return TransactionDeleteDialog(
+                                    transactionType:
+                                        transaction['transaction_type'],
+                                    name: transaction['description'],
+                                    icon: transaction['categoryImg'],
+                                    price: HomeHelper.formatIndianCurrency(
+                                            transaction['amount'])
+                                        .toString(),
+                                    date: transaction['date'],
+                                    dbHelper: dbHelper,
+                                    onDeleteSuccess: () {
+                                      setState(() {
+                                        _fetchTransactionData(); // Refresh the data after deletion
+                                      });
+                                    },
+                                  );
+                                },
+                              );
+                            },
                           ),
                   );
                 },

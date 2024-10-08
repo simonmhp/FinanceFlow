@@ -104,7 +104,7 @@ class DatabaseHelper {
     final db = await database;
 
     final List<Map<String, dynamic>> result = await db.rawQuery('''
-    SELECT category, categoryImg, SUM(CASE WHEN transaction_type = 'Expense' THEN amount ELSE 0 END) as amount
+    SELECT category, categoryImg, SUM(CASE WHEN transaction_type = 'Expense' THEN amount ELSE 0 END) as amount, date
     FROM transactions
     WHERE transaction_type = 'Expense'
     GROUP BY category, categoryImg
@@ -200,7 +200,7 @@ class DatabaseHelper {
     final currentYear = DateTime.now().year;
 
     final List<Map<String, dynamic>> result = await db.rawQuery('''
-    SELECT description, amount, date
+    SELECT *
     FROM transactions
     WHERE transaction_type = 'Income'
     AND strftime('%m', date) = ? 
@@ -405,7 +405,7 @@ class DatabaseHelper {
 
   // ******************* Expense Delete Dialog-Box Methods *******************
 
-  Future<bool> removeExpenseEntry(String date, String category) async {
+  Future<bool> removeTransactionEntry(String date, String category) async {
     final db = await database; // Your database instance
 
     // Execute the delete query

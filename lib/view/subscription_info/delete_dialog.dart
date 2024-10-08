@@ -29,7 +29,7 @@ class TransactionDeleteDialog extends StatelessWidget {
     // Determine the border color based on the transaction type
     Color borderColor;
     if (transactionType == "Income") {
-      borderColor = Colors.green.shade200; // Green for Income
+      borderColor = TColor.primary5; // Green for Income
     } else if (transactionType == "Expense") {
       borderColor = Colors.orange.shade500; // Orange for Expense
     } else {
@@ -77,7 +77,7 @@ class TransactionDeleteDialog extends StatelessWidget {
           onPressed: () async {
             print("data:" + date + ":" + transactionType + ":" + price);
             // Call removeExpenseEntry when Delete is pressed
-            final success = await dbHelper.removeExpenseEntry(
+            final success = await dbHelper.removeTransactionEntry(
                 date, transactionType); // Make sure to pass price as well
             Navigator.pop(context); // Close the dialog after deletion
 

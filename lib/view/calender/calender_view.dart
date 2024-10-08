@@ -6,10 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:moneytracker/common/color_extension.dart';
 import 'package:moneytracker/common_widget/day_transactions.dart';
 import 'package:moneytracker/view/home/helper.dart';
-import 'package:moneytracker/view/settings/settings_view.dart';
 import 'package:moneytracker/view/sqflite/db_helper.dart';
-
-import '../../common_widget/subscription_cell.dart';
 
 class CalenderView extends StatefulWidget {
   const CalenderView({super.key});
@@ -64,7 +61,6 @@ class _CalenderViewState extends State<CalenderView> {
 
   @override
   Widget build(BuildContext context) {
-    var media = MediaQuery.sizeOf(context);
     return Scaffold(
       backgroundColor: TColor.gray,
       body: SingleChildScrollView(
