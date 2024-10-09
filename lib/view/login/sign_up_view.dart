@@ -63,7 +63,7 @@ class _SignUpViewState extends State<SignUpView> {
     } catch (e) {
       print("Error signing up: ${e.toString()}");
       Fluttertoast.showToast(
-        msg: "Error signing up: ${e.toString()}",
+        msg: "Error signing up! Try again",
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
         backgroundColor: Colors.red,
@@ -104,8 +104,11 @@ class _SignUpViewState extends State<SignUpView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset("assets/img/logo-no-background.png",
-                  width: media.width * 0.5, fit: BoxFit.contain),
+              Padding(
+                padding: const EdgeInsets.only(top: 35.0),
+                child: Image.asset("assets/img/logo-no-background.png",
+                    width: media.width * 0.5, fit: BoxFit.contain),
+              ),
               const Spacer(),
               RoundTextField(
                 title: "Username",

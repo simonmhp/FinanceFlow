@@ -73,7 +73,7 @@ class _SignInViewState extends State<SignInView> {
     } catch (e) {
       print("Login failed: ${e.toString()}");
       Fluttertoast.showToast(
-        msg: "Login failed: ${e.toString()}",
+        msg: "Incorrect Email and Password",
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
         backgroundColor: Colors.red,
@@ -107,8 +107,11 @@ class _SignInViewState extends State<SignInView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset("assets/img/logo-no-background.png",
-                  width: media.width * 0.5, fit: BoxFit.contain),
+              Padding(
+                padding: const EdgeInsets.only(top: 35.0),
+                child: Image.asset("assets/img/logo-no-background.png",
+                    width: media.width * 0.5, fit: BoxFit.contain),
+              ),
               const Spacer(),
               RoundTextField(
                 title: "Login",

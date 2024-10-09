@@ -41,8 +41,11 @@ class _WelcomeViewState extends State<WelcomeView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.asset("assets/img/logo-no-background.png",
-                      width: media.width * 0.5, fit: BoxFit.contain),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 35.0),
+                    child: Image.asset("assets/img/logo-no-background.png",
+                        width: media.width * 0.5, fit: BoxFit.contain),
+                  ),
                   const Spacer(),
                   Text(
                     "Know Where Your Money Goes \nTake Control of Your Finances!",
