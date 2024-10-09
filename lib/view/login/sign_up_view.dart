@@ -100,7 +100,7 @@ class _SignUpViewState extends State<SignUpView> {
       backgroundColor: TColor.gray,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -115,20 +115,20 @@ class _SignUpViewState extends State<SignUpView> {
                 controller: txtUsername,
                 keyboardType: TextInputType.text,
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
               RoundTextField(
                 title: "E-mail address",
                 controller: txtEmail,
                 keyboardType: TextInputType.emailAddress,
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
               RoundPTextField(
                 title: "Password",
                 controller: txtPassword,
                 obscureText: true,
                 onChanged: (password) => _updatePasswordStrength(password),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Row(
                 children: List.generate(
                   4,
@@ -155,7 +155,7 @@ class _SignUpViewState extends State<SignUpView> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : PrimaryButton(
