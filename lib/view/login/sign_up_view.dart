@@ -100,12 +100,12 @@ class _SignUpViewState extends State<SignUpView> {
       backgroundColor: TColor.gray,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+          padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 35.0),
+                padding: const EdgeInsets.only(top: 17.0),
                 child: Image.asset("assets/img/logo-no-background.png",
                     width: media.width * 0.5, fit: BoxFit.contain),
               ),
