@@ -104,7 +104,7 @@ class _SignUpViewState extends State<SignUpView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset("assets/img/app_logo.png",
+              Image.asset("assets/img/logo-no-background.png",
                   width: media.width * 0.5, fit: BoxFit.contain),
               const Spacer(),
               RoundTextField(

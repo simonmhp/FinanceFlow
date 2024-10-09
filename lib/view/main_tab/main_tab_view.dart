@@ -33,7 +33,7 @@ class _MainTabViewState extends State<MainTabView> {
     checkAndTruncateBudget();
 
     if (isFirstLogin) {
-      fetchRemoteTransactions();
+      // fetchRemoteTransactions();
       setState(() {
         isFirstLogin = false;
       });

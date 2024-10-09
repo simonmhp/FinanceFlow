@@ -30,7 +30,7 @@ class _WelcomeViewState extends State<WelcomeView> {
         alignment: Alignment.topCenter,
         children: [
           Image.asset(
-            "assets/img/welcome_screen.png",
+            "assets/img/welcome_back.jpg",
             width: media.width,
             height: media.height,
             fit: BoxFit.cover,
@@ -41,11 +41,11 @@ class _WelcomeViewState extends State<WelcomeView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.asset("assets/img/app_logo.png",
+                  Image.asset("assets/img/logo-no-background.png",
                       width: media.width * 0.5, fit: BoxFit.contain),
                   const Spacer(),
                   Text(
-                    "Congue malesuada in ac justo, a tristique\nleo massa. Arcu leo leo urna risus.",
+                    "Know Where Your Money Goes \nTake Control of Your Finances!",
                     textAlign: TextAlign.center,
                     style: TextStyle(color: TColor.white, fontSize: 14),
                   ),
@@ -66,16 +66,19 @@ class _WelcomeViewState extends State<WelcomeView> {
                   const SizedBox(
                     height: 15,
                   ),
-                  SecondaryButton(
-                    title: "I have an account",
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SignInView(),
-                        ),
-                      );
-                    },
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 15.0),
+                    child: SecondaryButton(
+                      title: "I have an account",
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SignInView(),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),

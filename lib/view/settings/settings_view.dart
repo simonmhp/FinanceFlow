@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:moneytracker/common_widget/editing_username.dart';
 import 'package:moneytracker/common_widget/icon_item_button.dart';
 import 'package:moneytracker/view/lets_get_Started/splash_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../common/color_extension.dart';
 import '../../common_widget/icon_item_row.dart';
 import 'package:moneytracker/view/sqflite/db_helper.dart'; // Import the DatabaseHelper
@@ -31,14 +32,15 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   Future<void> getUser() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null && isActive) {
-      await syncToFirebase(user.uid);
-    } else if (!isActive) {
-      showToast("Firebase Sync Session Over");
-    } else {
-      showToast("Error occurred. Restart app from memory.");
-    }
+    showToast("Cloud Feature Coming Soon.");
+    // final user = FirebaseAuth.instance.currentUser;
+    // if (user != null && isActive) {
+    //   await syncToFirebase(user.uid);
+    // } else if (!isActive) {
+    //   showToast("Firebase Sync Session Over");
+    // } else {
+    //   showToast("Error occurred. Restart app from memory.");
+    // }
   }
 
   Future<void> _loadUserData() async {
@@ -74,47 +76,59 @@ class _SettingsViewState extends State<SettingsView> {
     unsyncCount = unsyncedCount;
   }
 
-  Future<void> syncToFirebase(String uid) async {
-    if (!isActive) {
-      showToast("Firebase Sync is not active.");
-      return;
-    }
-
-    // Get unsynced transactions
-    final unsyncedTransactions =
-        await _databaseHelper.getUnsyncedTransactions();
-
-    if (unsyncedTransactions.isEmpty) {
-      showToast("No unsynced transactions found.");
-      return;
-    }
-
-    final database = FirebaseDatabase.instance.ref();
-
-    try {
-      // Upload each transaction to Firebase under the user ID
-      for (var transaction in unsyncedTransactions) {
-        await database
-            .child('users')
-            .child(uid) // Use the UID here
-            .child('transactions')
-            .push()
-            .set(transaction.toMap());
-
-        // Optionally update the local database to mark it as synced
-        await _databaseHelper.updateTransactionSyncStatus(transaction.id, true);
-      }
-
-      // After successful upload, set isActive to false
-      setState(() {
-        isActive = false;
-      });
-
-      showToast("Sync successful!");
-    } catch (e) {
-      showToast("Sync failed: $e");
+  Future<void> openWebView(String url) async {
+    if (!await launchUrl(Uri.parse(url), mode: LaunchMode.inAppWebView)) {
+      throw Exception("Couldn't launch Url");
     }
   }
+
+  Future<void> openBrowserView(String url) async {
+    if (!await launchUrl(Uri.parse(url), mode: LaunchMode.inAppBrowserView)) {
+      throw Exception("Couldn't launch Url");
+    }
+  }
+
+  // Future<void> syncToFirebase(String uid) async {
+  //   if (!isActive) {
+  //     showToast("Firebase Sync is not active.");
+  //     return;
+  //   }
+
+  //   // Get unsynced transactions
+  //   final unsyncedTransactions =
+  //       await _databaseHelper.getUnsyncedTransactions();
+
+  //   if (unsyncedTransactions.isEmpty) {
+  //     showToast("No unsynced transactions found.");
+  //     return;
+  //   }
+
+  //   final database = FirebaseDatabase.instance.ref();
+
+  //   try {
+  //     // Upload each transaction to Firebase under the user ID
+  //     for (var transaction in unsyncedTransactions) {
+  //       await database
+  //           .child('users')
+  //           .child(uid) // Use the UID here
+  //           .child('transactions')
+  //           .push()
+  //           .set(transaction.toMap());
+
+  //       // Optionally update the local database to mark it as synced
+  //       await _databaseHelper.updateTransactionSyncStatus(transaction.id, true);
+  //     }
+
+  //     // After successful upload, set isActive to false
+  //     setState(() {
+  //       isActive = false;
+  //     });
+
+  //     showToast("Sync successful!");
+  //   } catch (e) {
+  //     showToast("Sync failed: $e");
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -253,27 +267,37 @@ class _SettingsViewState extends State<SettingsView> {
                           color: TColor.gray60.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: const Column(
+                        child: Column(
                           children: [
-                            IconItemRow(
+                            const IconItemRow(
                               title: "Created By",
                               icon: "assets/img/coding.png",
                               value: "Simon Mohapatra",
                             ),
-                            IconItemRow(
+                            const IconItemRow(
                               title: "Designed with",
                               icon: "assets/img/code.png",
                               value: "Flutter",
                             ),
-                            IconItemSocialRow(
-                              title: "Check Out my",
-                              icon: "assets/img/social.png",
-                              value: "Github",
+                            InkWell(
+                              onTap: () {
+                                openBrowserView("https://github.com/simonmhp");
+                              },
+                              child: const IconItemSocialRow(
+                                title: "Check Out my",
+                                icon: "assets/img/social.png",
+                                value: "Github",
+                              ),
                             ),
-                            IconItemSocialRow(
-                              title: "Check Out my",
-                              icon: "assets/img/browser.png",
-                              value: "Website",
+                            InkWell(
+                              onTap: () {
+                                openWebView("https://simonmhp.github.io/");
+                              },
+                              child: const IconItemSocialRow(
+                                title: "Check Out my",
+                                icon: "assets/img/browser.png",
+                                value: "Website",
+                              ),
                             ),
                           ],
                         ),

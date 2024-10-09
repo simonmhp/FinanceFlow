@@ -461,64 +461,63 @@ class DatabaseHelper {
   // ******************* Expense Delete Dialog-Box Methods *******************
 
   // Handle delete operations only for Sqflite database.
-  // Future<bool> removeTransactionEntry(String date, String category) async {
-  //   final db = await database; // Your database instance
-
-  //   // Execute the delete query
-  //   final result = await db.delete(
-  //     'transactions',
-  //     where: 'date = ? AND transaction_type = ? ',
-  //     whereArgs: [date, category],
-  //   );
-
-  //   // Check if the deletion was successful
-  //   return result > 0; // If one or more rows were deleted, return true
-  // }
-
-  // Handle Delete operation for isSynced = 1 to delete in Sflite and Firebase database.
   Future<bool> removeTransactionEntry(String date, String category) async {
-    final db = await database; // Your database instance
+    final db = await database;
 
-    List<Map<String, dynamic>> syncedTransactions = await db.query(
-      'transactions',
-      where: 'date = ? AND category = ? AND isSynced = 1',
-      whereArgs: [date, category],
-    );
-    if (syncedTransactions.isNotEmpty) {
-      final user = FirebaseAuth.instance.currentUser;
-
-      if (user != null) {
-        DatabaseReference ref =
-            FirebaseDatabase.instance.ref("users/${user.uid}/transactions");
-
-        DataSnapshot snapshot = await ref.get();
-
-        if (snapshot.exists) {
-          Map<dynamic, dynamic> data = snapshot.value as Map<dynamic, dynamic>;
-
-          String? keyToDelete;
-
-          data.forEach((key, value) {
-            if (value['date'] == date && value['category'] == category) {
-              keyToDelete = key;
-            }
-          });
-
-          if (keyToDelete != null) {
-            await ref.child(keyToDelete!).remove();
-          }
-        }
-      }
-    }
-
+    // Execute the delete query
     final result = await db.delete(
       'transactions',
-      where: 'date = ? AND category = ?',
+      where: 'date = ? AND transaction_type = ? ',
       whereArgs: [date, category],
     );
 
     return result > 0;
   }
+
+  // Handle Delete operation for isSynced = 1 to delete in Sflite and Firebase database.
+  // Future<bool> removeTransactionEntry(String date, String category) async {
+  //   final db = await database; // Your database instance
+
+  //   List<Map<String, dynamic>> syncedTransactions = await db.query(
+  //     'transactions',
+  //     where: 'date = ? AND category = ? AND isSynced = 1',
+  //     whereArgs: [date, category],
+  //   );
+  //   if (syncedTransactions.isNotEmpty) {
+  //     final user = FirebaseAuth.instance.currentUser;
+
+  //     if (user != null) {
+  //       DatabaseReference ref =
+  //           FirebaseDatabase.instance.ref("users/${user.uid}/transactions");
+
+  //       DataSnapshot snapshot = await ref.get();
+
+  //       if (snapshot.exists) {
+  //         Map<dynamic, dynamic> data = snapshot.value as Map<dynamic, dynamic>;
+
+  //         String? keyToDelete;
+
+  //         data.forEach((key, value) {
+  //           if (value['date'] == date && value['category'] == category) {
+  //             keyToDelete = key;
+  //           }
+  //         });
+
+  //         if (keyToDelete != null) {
+  //           await ref.child(keyToDelete!).remove();
+  //         }
+  //       }
+  //     }
+  //   }
+
+  //   final result = await db.delete(
+  //     'transactions',
+  //     where: 'date = ? AND category = ?',
+  //     whereArgs: [date, category],
+  //   );
+
+  //   return result > 0;
+  // }
 
   // ******************* Settings  Methods *******************
 

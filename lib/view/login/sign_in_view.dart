@@ -107,7 +107,7 @@ class _SignInViewState extends State<SignInView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset("assets/img/app_logo.png",
+              Image.asset("assets/img/logo-no-background.png",
                   width: media.width * 0.5, fit: BoxFit.contain),
               const Spacer(),
               RoundTextField(
@@ -126,46 +126,46 @@ class _SignInViewState extends State<SignInView> {
               const SizedBox(
                 height: 8,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        isRemember = !isRemember;
-                      });
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isRemember
-                              ? Icons.check_box_rounded
-                              : Icons.check_box_outline_blank_rounded,
-                          size: 25,
-                          color: TColor.gray50,
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        Text(
-                          "Remember me",
-                          style: TextStyle(color: TColor.gray50, fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      "Forgot password",
-                      style: TextStyle(color: TColor.gray50, fontSize: 14),
-                    ),
-                  ),
-                ],
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     TextButton(
+              //       onPressed: () {
+              //         setState(() {
+              //           isRemember = !isRemember;
+              //         });
+              //       },
+              //       child: Row(
+              //         mainAxisSize: MainAxisSize.min,
+              //         children: [
+              //           Icon(
+              //             isRemember
+              //                 ? Icons.check_box_rounded
+              //                 : Icons.check_box_outline_blank_rounded,
+              //             size: 25,
+              //             color: TColor.gray50,
+              //           ),
+              //           const SizedBox(
+              //             width: 8,
+              //           ),
+              //           Text(
+              //             "Remember me",
+              //             style: TextStyle(color: TColor.gray50, fontSize: 14),
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+              //     TextButton(
+              //       onPressed: () {},
+              //       child: Text(
+              //         "Forgot password",
+              //         style: TextStyle(color: TColor.gray50, fontSize: 14),
+              //       ),
+              //     ),
+              //   ],
+              // ),
               const SizedBox(
-                height: 8,
+                height: 15,
               ),
               isLoading
                   ? const CircularProgressIndicator()
