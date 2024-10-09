@@ -1,12 +1,15 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:moneytracker/view/login/welcome_view.dart';
 import 'package:moneytracker/view/main_tab/main_tab_view.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SplashScreenState createState() => _SplashScreenState();
 }
 
@@ -45,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen> {
         children: [
           // Background image
           Image.asset(
-            'assets/splash/logo-no-background2.png', // Replace with your background image path
+            'assets/splash/logo-no-background1.png', // Replace with your background image path
             fit: BoxFit.fill,
           ),
           // Centered content

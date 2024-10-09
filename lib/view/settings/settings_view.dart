@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart'; // Add this for Firebase auth
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:moneytracker/common_widget/editing_username.dart';
 import 'package:moneytracker/common_widget/icon_item_button.dart';
-import 'package:moneytracker/view/lets_get_Started/SplashPage.dart';
+import 'package:moneytracker/view/lets_get_Started/splash_page.dart';
 import '../../common/color_extension.dart';
 import '../../common_widget/icon_item_row.dart';
 import 'package:moneytracker/view/sqflite/db_helper.dart'; // Import the DatabaseHelper
@@ -18,24 +18,22 @@ class SettingsView extends StatefulWidget {
 
 class _SettingsViewState extends State<SettingsView> {
   bool isActive = false;
-  DatabaseHelper _databaseHelper =
-      DatabaseHelper(); // Initialize the database helper
+  final DatabaseHelper _databaseHelper = DatabaseHelper();
   String username = "";
   String email = "";
   int unsyncCount = 0;
 
   @override
   void initState() {
-    super.initState(); // Call a separate method to handle async logic
+    super.initState();
     _loadUserData();
-    someFunction(); // Load user data on init
+    someFunction();
   }
 
   Future<void> getUser() async {
-    // Assuming you have the current user UID available from FirebaseAuth
     final user = FirebaseAuth.instance.currentUser;
     if (user != null && isActive) {
-      await syncToFirebase(user.uid); // Pass the UID as a positional parameter
+      await syncToFirebase(user.uid);
     } else if (!isActive) {
       showToast("Firebase Sync Session Over");
     } else {
@@ -44,14 +42,11 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   Future<void> _loadUserData() async {
-    final userData =
-        await _databaseHelper.getUser(); // Adjust this method as needed
+    final userData = await _databaseHelper.getUser();
     if (userData != null) {
       setState(() {
-        username = userData[
-            'username']; // Assuming 'username' is a field in your database
-        email =
-            userData['email']; // Assuming 'email' is a field in your database
+        username = userData['username'];
+        email = userData['email'];
       });
     }
   }
@@ -81,7 +76,7 @@ class _SettingsViewState extends State<SettingsView> {
 
   Future<void> syncToFirebase(String uid) async {
     if (!isActive) {
-      showToast("Firebase Sync is not active."); // Toast helper method
+      showToast("Firebase Sync is not active.");
       return;
     }
 
@@ -89,7 +84,6 @@ class _SettingsViewState extends State<SettingsView> {
     final unsyncedTransactions =
         await _databaseHelper.getUnsyncedTransactions();
 
-    // Check if there are transactions to sync
     if (unsyncedTransactions.isEmpty) {
       showToast("No unsynced transactions found.");
       return;
@@ -116,10 +110,9 @@ class _SettingsViewState extends State<SettingsView> {
         isActive = false;
       });
 
-      showToast("Sync successful!"); // Display success toast
+      showToast("Sync successful!");
     } catch (e) {
-      print("Error syncing to Firebase: $e");
-      showToast("Sync failed: $e"); // Display error toast
+      showToast("Sync failed: $e");
     }
   }
 
@@ -172,9 +165,7 @@ class _SettingsViewState extends State<SettingsView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      username.isNotEmpty
-                          ? username
-                          : "Loading...", // Display username
+                      username.isNotEmpty ? username : "Loading...",
                       style: TextStyle(
                         color: TColor.white,
                         fontSize: 20,
@@ -188,7 +179,7 @@ class _SettingsViewState extends State<SettingsView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      email.isNotEmpty ? email : "Loading...", // Display email
+                      email.isNotEmpty ? email : "Loading...",
                       style: TextStyle(
                         color: TColor.gray30,
                         fontSize: 12,
@@ -201,19 +192,16 @@ class _SettingsViewState extends State<SettingsView> {
                 InkWell(
                   borderRadius: BorderRadius.circular(15),
                   onTap: () async {
-                    // Open the dialog and await the result
                     bool? isUpdated = await showDialog<bool>(
                       context: context,
                       builder: (context) {
                         return EditUsernameDialog(
-                          currentUsername:
-                              username, // Replace with actual username
-                          currentEmail: email, // Replace with actual email
+                          currentUsername: username,
+                          currentEmail: email,
                         );
                       },
                     );
 
-                    // Refresh the page if the username was updated
                     if (isUpdated == true) {
                       setState(() {
                         _loadUserData();
@@ -378,15 +366,14 @@ class _SettingsViewState extends State<SettingsView> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20), // Add some spacing
+                      const SizedBox(height: 20),
                       Center(
                         child: ElevatedButton(
-                          onPressed: _logout, // Call the logout function
+                          onPressed: _logout,
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 12),
-                            backgroundColor:
-                                Colors.red, // Change to any desired color
+                            backgroundColor: Colors.red,
                           ),
                           child: const Text(
                             "Logout",
@@ -405,9 +392,7 @@ class _SettingsViewState extends State<SettingsView> {
     );
   }
 
-  // Assuming you have a toast helper function
   void showToast(String message) {
-    // Implement the toast message display, e.g., using FlutterToast or another package
     Fluttertoast.showToast(
       msg: message,
       toastLength: Toast.LENGTH_SHORT,

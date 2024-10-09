@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -5,7 +7,7 @@ import 'package:sqflite/sqflite.dart';
 class Transaction {
   final int id;
   final String description;
-  final String transactionType; // Renamed for consistency
+  final String transactionType;
   final double amount;
   final String date;
   final String category;
@@ -66,17 +68,13 @@ class DatabaseHelper {
   Future<Database> get database async {
     if (_database != null) return _database!;
 
-    // Initialize the database if it doesn't exist
     _database = await _initDatabase();
     return _database!;
   }
 
   Future<Database> _initDatabase() async {
-    // Get the path to the database
-    String path =
-        join(await getDatabasesPath(), 'app_database.db'); // Unified DB
+    String path = join(await getDatabasesPath(), 'app_database.db');
 
-    // Open or create the database
     return await openDatabase(
       path,
       version: 1,
@@ -84,7 +82,7 @@ class DatabaseHelper {
     );
   }
 
-  // ******************* Create both users and transactions tables *******************
+  // ******************* Create tables *******************
 
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
@@ -98,17 +96,18 @@ class DatabaseHelper {
     ''');
 
     await db.execute('''
-      CREATE TABLE transactions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        description TEXT NOT NULL,
-        transaction_type TEXT NOT NULL,
-        amount REAL NOT NULL,
-        date TEXT NOT NULL,
-        category TEXT NOT NULL,
-        categoryImg TEXT NOT NULL,
-        isSynced INTEGER NOT NULL DEFAULT 0  -- 0 = Not synced, 1 = Synced
-      )
-    ''');
+  CREATE TABLE transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    description TEXT NOT NULL,
+    transaction_type TEXT NOT NULL,
+    amount REAL NOT NULL,
+    date TEXT NOT NULL,
+    category TEXT NOT NULL,
+    categoryImg TEXT NOT NULL,
+    isSynced INTEGER NOT NULL DEFAULT 0,  -- 0 = Not synced, 1 = Synced
+    UNIQUE (date)  -- Ensures that the combination of date and category is unique
+  )
+''');
 
     // Create the Budget table
     await db.execute('''
@@ -133,7 +132,7 @@ class DatabaseHelper {
   Future<Map<String, dynamic>?> getUser() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('users', limit: 1);
-    return maps.isNotEmpty ? maps.first : null; // Return the first user or null
+    return maps.isNotEmpty ? maps.first : null;
   }
 
   // Truncate users table (log out)
@@ -178,7 +177,7 @@ class DatabaseHelper {
     WHERE transaction_type = 'Expense'
       AND strftime('%Y', date) = ? 
       AND strftime('%m', date) = ?
-  ''', ['$year', '$month']); // Bind year and month as parameters
+  ''', ['$year', '$month']);
 
     // Check if the result is not empty and return the max amount or 0
     return result.isNotEmpty ? result.first['maxAmount'] ?? 0.0 : 0.0;
@@ -198,7 +197,7 @@ class DatabaseHelper {
     WHERE transaction_type = 'Income' 
       AND strftime('%Y', date) = ? 
       AND strftime('%m', date) = ?
-  ''', ['$year', '$month']); // Bind year and month as parameters
+  ''', ['$year', '$month']);
 
     // Check if the result is not empty and return the max amount or 0
     return result.isNotEmpty ? result.first['maxAmount'] ?? 0.0 : 0.0;
@@ -218,7 +217,7 @@ class DatabaseHelper {
     WHERE transaction_type = 'Expense'
       AND strftime('%Y', date) = ? 
       AND strftime('%m', date) = ?
-  ''', ['$year', '$month']); // Bind year and month as parameters
+  ''', ['$year', '$month']);
 
     // Check if the result is not empty and return the max amount or 0
     return result.isNotEmpty ? result.first['maxAmount'] ?? 0.0 : 0.0;
@@ -238,7 +237,7 @@ class DatabaseHelper {
     WHERE transaction_type = 'Expense'
       AND strftime('%Y', date) = ? 
       AND strftime('%m', date) = ?
-  ''', ['$year', '$month']); // Bind year and month as parameters
+  ''', ['$year', '$month']);
 
     // Check if the result is not empty and return the max amount or 0
     return result.isNotEmpty ? result.first['maxAmount'] ?? 0.0 : 0.0;
@@ -269,9 +268,7 @@ class DatabaseHelper {
       where: 'id = ?',
       whereArgs: [id],
     );
-    return maps.isNotEmpty
-        ? maps.first
-        : null; // Return the first transaction or null
+    return maps.isNotEmpty ? maps.first : null;
   }
 
   // Update a transaction by ID
@@ -299,7 +296,7 @@ class DatabaseHelper {
   // Truncate transactions table
   Future<void> truncateTransactions() async {
     final db = await database;
-    await db.delete('transactions'); // This effectively truncates the table
+    await db.delete('transactions');
   }
 
   // ******************* Budget Table Methods *******************
@@ -308,7 +305,6 @@ class DatabaseHelper {
   Future<int> insertBudget(Map<String, dynamic> budget) async {
     final db = await database;
 
-    // Check if the budget entry already exists
     var existingEntry = await db.query(
       'budget',
       where: 'category = ? AND month = ?',
@@ -316,7 +312,6 @@ class DatabaseHelper {
     );
 
     if (existingEntry.isNotEmpty) {
-      // If it exists, update the existing entry
       return await db.update(
         'budget',
         budget,
@@ -324,7 +319,6 @@ class DatabaseHelper {
         whereArgs: [budget['category'], budget['month']],
       );
     } else {
-      // If it doesn't exist, insert a new entry
       return await db.insert('budget', budget);
     }
   }
@@ -356,15 +350,15 @@ class DatabaseHelper {
     );
   }
 
-// Truncate budget table
+  // Truncate budget table
   Future<void> truncateBudgets() async {
     final db = await database;
-    await db.delete('budget'); // This effectively truncates the table
+    await db.delete('budget');
   }
 
   Future<List<Map<String, dynamic>>> getBudgetsForMonth(String month) async {
     final db = await database;
-    // Fetch budgets where month matches the current month
+
     List<Map<String, dynamic>> budgets = await db.query(
       'budget',
       where: 'month = ?',
@@ -373,7 +367,6 @@ class DatabaseHelper {
     return budgets;
   }
 
-  // Fetch all transactions for the current month
   Future<List<Map<String, dynamic>>> getTransactionsForMonth() async {
     final db = await database;
 
@@ -397,14 +390,12 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getAllTransactionsForTheDaySelected(
       String selectedDate) async {
     final db = await database;
-    // print("Fetching transactions for date: $selectedDate");
 
-    // Use the LIKE operator to match the selected date pattern
     final List<Map<String, dynamic>> result = await db.rawQuery('''
     SELECT * 
     FROM transactions 
     WHERE date LIKE ? 
-  ''', ['$selectedDate%']); // Use % wildcard to match any additional characters
+  ''', ['$selectedDate%']);
 
     return result;
   }
@@ -412,19 +403,36 @@ class DatabaseHelper {
   Future<double> getDateTotalExpense(String selectedDate) async {
     final db = await database;
 
-    // Use the LIKE operator to match the selected date pattern
     final List<Map<String, dynamic>> result = await db.rawQuery('''
     SELECT SUM(amount) as TotalExpense 
     FROM transactions 
     WHERE transaction_type = 'Expense' AND date LIKE ? 
-  ''', ['$selectedDate%']); // Use % wildcard to match any additional characters
+  ''', ['$selectedDate%']);
 
-    // Check if the result is not empty and return the total expense
     if (result.isNotEmpty && result[0]['TotalExpense'] != null) {
       return result[0]['TotalExpense'] as double;
     }
+    return 0.0;
+  }
 
-    // Return 0 if no expenses were found
+  Future<double> getMonthTotalIncome(
+      String selectedMonth, String selectedYear) async {
+    final db = await database;
+
+    // Construct the date range for the specified month
+    String startDate = '$selectedYear-$selectedMonth-01 00:00:00';
+    String endDate =
+        '$selectedYear-$selectedMonth-31 23:59:59'; // End of the month
+
+    final List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT SUM(amount) as TotalIncome 
+    FROM transactions 
+    WHERE transaction_type = 'Income' AND date BETWEEN ? AND ?
+  ''', [startDate, endDate]);
+
+    if (result.isNotEmpty && result[0]['TotalIncome'] != null) {
+      return result[0]['TotalIncome'] as double;
+    }
     return 0.0;
   }
 
@@ -435,12 +443,9 @@ class DatabaseHelper {
       String category) async {
     final db = await database;
 
-    // Get the current month as a string
     String currentMonth = DateFormat('MM').format(DateTime.now());
-    // Get the current year as well
     String currentYear = DateFormat('yyyy').format(DateTime.now());
 
-    // Query the transactions table for the required data using rawQuery
     List<Map<String, dynamic>> result = await db.rawQuery('''
     SELECT * 
     FROM transactions
@@ -450,24 +455,69 @@ class DatabaseHelper {
       AND transaction_type = ?
   ''', [category, currentMonth, currentYear, 'Expense']);
 
-    // Return the list of matching transactions
     return result;
   }
 
   // ******************* Expense Delete Dialog-Box Methods *******************
 
+  // Handle delete operations only for Sqflite database.
+  // Future<bool> removeTransactionEntry(String date, String category) async {
+  //   final db = await database; // Your database instance
+
+  //   // Execute the delete query
+  //   final result = await db.delete(
+  //     'transactions',
+  //     where: 'date = ? AND transaction_type = ? ',
+  //     whereArgs: [date, category],
+  //   );
+
+  //   // Check if the deletion was successful
+  //   return result > 0; // If one or more rows were deleted, return true
+  // }
+
+  // Handle Delete operation for isSynced = 1 to delete in Sflite and Firebase database.
   Future<bool> removeTransactionEntry(String date, String category) async {
     final db = await database; // Your database instance
 
-    // Execute the delete query
+    List<Map<String, dynamic>> syncedTransactions = await db.query(
+      'transactions',
+      where: 'date = ? AND category = ? AND isSynced = 1',
+      whereArgs: [date, category],
+    );
+    if (syncedTransactions.isNotEmpty) {
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        DatabaseReference ref =
+            FirebaseDatabase.instance.ref("users/${user.uid}/transactions");
+
+        DataSnapshot snapshot = await ref.get();
+
+        if (snapshot.exists) {
+          Map<dynamic, dynamic> data = snapshot.value as Map<dynamic, dynamic>;
+
+          String? keyToDelete;
+
+          data.forEach((key, value) {
+            if (value['date'] == date && value['category'] == category) {
+              keyToDelete = key;
+            }
+          });
+
+          if (keyToDelete != null) {
+            await ref.child(keyToDelete!).remove();
+          }
+        }
+      }
+    }
+
     final result = await db.delete(
       'transactions',
-      where: 'date = ? AND transaction_type = ? ',
+      where: 'date = ? AND category = ?',
       whereArgs: [date, category],
     );
 
-    // Check if the deletion was successful
-    return result > 0; // If one or more rows were deleted, return true
+    return result > 0;
   }
 
   // ******************* Settings  Methods *******************
@@ -476,22 +526,19 @@ class DatabaseHelper {
   Future<int> updateUsername(String newUsername, String email) async {
     final db = await database;
 
-    // Ensure database is not null
-    if (db == null) return 0;
-
-    // Update the username where the email matches
     return await db.update(
-      'users', // The table name
-      {'username': newUsername}, // The values to update (new username)
-      where: 'email = ?', // The condition to match the email
-      whereArgs: [email], // The argument to bind to the condition
+      'users',
+      {'username': newUsername},
+      where: 'email = ?',
+      whereArgs: [email],
     );
   }
+
+  // ******************* Settings Firebase related Methods *******************
 
   Future<int> countUnsyncedTransactions() async {
     final db = await database;
 
-    // Count transactions where isSynced = 0
     final List<Map<String, dynamic>> result = await db.rawQuery('''
     SELECT COUNT(*) as count 
     FROM transactions 
@@ -505,32 +552,27 @@ class DatabaseHelper {
   Future<List<Transaction>> getUnsyncedTransactions() async {
     final db = await database;
 
-    // Fetch transactions where isSynced = 0 using rawQuery
     final List<Map<String, dynamic>> maps = await db.rawQuery('''
     SELECT * FROM transactions WHERE isSynced = 0
   ''');
 
-    // Convert the list of maps into a list of Transaction objects
     return List.generate(maps.length, (i) {
       return Transaction.fromMap(maps[i]);
     });
   }
 
-  // Update the sync status of a transaction
   Future<int> updateTransactionSyncStatus(
       int transactionId, bool isSynced) async {
     final db = await database;
 
-    // Convert the boolean to integer (0 for false, 1 for true)
     int syncValue = isSynced ? 1 : 0;
 
-    // Update the transaction's sync status using rawQuery
     final result = await db.rawUpdate('''
     UPDATE transactions 
     SET isSynced = ? 
     WHERE id = ?
   ''', [syncValue, transactionId]);
 
-    return result; // This returns the number of rows affected
+    return result;
   }
 }

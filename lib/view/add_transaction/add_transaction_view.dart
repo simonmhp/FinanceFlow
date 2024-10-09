@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:moneytracker/common/color_extension.dart';
@@ -7,17 +9,16 @@ import 'package:moneytracker/common_widget/round_textfield.dart';
 import 'package:moneytracker/view/sqflite/db_helper.dart';
 import '../../common_widget/image_button.dart';
 
-class AddSubScriptionView extends StatefulWidget {
-  const AddSubScriptionView({super.key});
+class AddTransactionView extends StatefulWidget {
+  const AddTransactionView({super.key});
 
   @override
-  State<AddSubScriptionView> createState() => _AddSubScriptionViewState();
+  State<AddTransactionView> createState() => _AddTransactionViewState();
 }
 
-class _AddSubScriptionViewState extends State<AddSubScriptionView> {
+class _AddTransactionViewState extends State<AddTransactionView> {
   final TextEditingController txtDescription = TextEditingController();
-  late TextEditingController
-      _amountController; // Declare a persistent controller for amount
+  late TextEditingController _amountController;
   String? selectedTransactionType;
   String? selectedCategory;
   String? selectedCategoryImg;
@@ -42,7 +43,7 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
   @override
   void initState() {
     super.initState();
-    // Initialize the amount controller with the current amount value
+
     _amountController =
         TextEditingController(text: amountVal.toStringAsFixed(0));
     print("omega:" + DateTime.now().toIso8601String());
@@ -50,7 +51,6 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
 
   @override
   void dispose() {
-    // Dispose controllers to free up resources
     txtDescription.dispose();
     _amountController.dispose();
     super.dispose();
@@ -93,8 +93,6 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
       );
     }
   }
-
-  // double amountVal = 0.0; // Use double for financial amounts
 
   @override
   Widget build(BuildContext context) {
@@ -196,8 +194,7 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
         itemCount: subCategories.length,
         itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
           var category = subCategories[itemIndex];
-          bool isSelected = selectedCategory ==
-              category["name"]; // Check if this category is selected
+          bool isSelected = selectedCategory == category["name"];
 
           return GestureDetector(
               onTap: () {
@@ -301,8 +298,7 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
                 if (amountVal < 0) {
                   amountVal = 0;
                 }
-                _amountController.text =
-                    amountVal.toStringAsFixed(0); // Update controller
+                _amountController.text = amountVal.toStringAsFixed(0);
               });
             },
           ),
@@ -334,8 +330,7 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
                         fontWeight: FontWeight.w700,
                       ),
                       textAlign: TextAlign.center,
-                      controller:
-                          _amountController, // Use the persistent controller
+                      controller: _amountController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         prefixText: "₹",
@@ -361,8 +356,7 @@ class _AddSubScriptionViewState extends State<AddSubScriptionView> {
             onPressed: () {
               setState(() {
                 amountVal += 1;
-                _amountController.text =
-                    amountVal.toStringAsFixed(0); // Update controller
+                _amountController.text = amountVal.toStringAsFixed(0);
               });
             },
           ),

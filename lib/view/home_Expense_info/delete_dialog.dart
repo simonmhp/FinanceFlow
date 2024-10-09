@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart'; // Import the toast package
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:moneytracker/common/color_extension.dart';
-import 'package:moneytracker/view/sqflite/db_helper.dart'; // Import your DatabaseHelper class
+import 'package:moneytracker/view/sqflite/db_helper.dart';
 
 class TransactionDeleteDialog extends StatelessWidget {
   final String transactionType;
@@ -21,19 +21,18 @@ class TransactionDeleteDialog extends StatelessWidget {
     required this.price,
     required this.date,
     required this.dbHelper,
-    required this.onDeleteSuccess, // Add this parameter
+    required this.onDeleteSuccess,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Determine the border color based on the transaction type
     Color borderColor;
     if (transactionType == "Income") {
-      borderColor = TColor.primary5; // Green for Income
+      borderColor = TColor.primary5;
     } else if (transactionType == "Expense") {
-      borderColor = Colors.orange.shade500; // Orange for Expense
+      borderColor = Colors.orange.shade500;
     } else {
-      borderColor = TColor.border.withOpacity(0.15); // Default border color
+      borderColor = TColor.border.withOpacity(0.15);
     }
 
     return AlertDialog(
@@ -75,14 +74,11 @@ class TransactionDeleteDialog extends StatelessWidget {
         ),
         TextButton(
           onPressed: () async {
-            print("data:" + date + ":" + transactionType + ":" + price);
-            // Call removeExpenseEntry when Delete is pressed
-            final success = await dbHelper.removeTransactionEntry(
-                date, transactionType); // Make sure to pass price as well
-            Navigator.pop(context); // Close the dialog after deletion
+            final success =
+                await dbHelper.removeTransactionEntry(date, transactionType);
+            Navigator.pop(context);
 
             if (success) {
-              // Show success toast message
               Fluttertoast.showToast(
                 msg: "Transaction deleted successfully",
                 toastLength: Toast.LENGTH_SHORT,
@@ -93,9 +89,8 @@ class TransactionDeleteDialog extends StatelessWidget {
                 fontSize: 16.0,
               );
 
-              onDeleteSuccess(); // Call the callback here to refresh the parent
+              onDeleteSuccess();
             } else {
-              // Show error toast message if deletion failed
               Fluttertoast.showToast(
                 msg: "Failed to delete transaction",
                 toastLength: Toast.LENGTH_SHORT,
@@ -116,14 +111,13 @@ class TransactionDeleteDialog extends StatelessWidget {
     );
   }
 
-  // Helper method to create a container with border
   Widget _buildInfoContainer(String? icon, String text, Color borderColor) {
     return Container(
       height: 64,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         border: Border.all(
-          color: borderColor, // Use the dynamically set border color
+          color: borderColor,
         ),
         borderRadius: BorderRadius.circular(16),
       ),

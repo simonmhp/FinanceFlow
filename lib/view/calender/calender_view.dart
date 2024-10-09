@@ -21,6 +21,7 @@ class _CalenderViewState extends State<CalenderView> {
   late DateTime selectedDateNotAppBBar;
   List<Map<String, dynamic>> transactionData = [];
   String dayTotalExpense = "";
+  String totalMIncome = "";
 
   Random random = Random();
 
@@ -34,28 +35,28 @@ class _CalenderViewState extends State<CalenderView> {
   Future<void> _fetchTransactionData() async {
     DatabaseHelper dbHelper = DatabaseHelper();
 
-    // Format selected date to "yyyy-MM-dd"
     String formattedDate =
         DateFormat('yyyy-MM-dd').format(selectedDateNotAppBBar);
+    String formattedYear = DateFormat('yyyy').format(selectedDateNotAppBBar);
+    String formattedMonth = DateFormat('MM').format(selectedDateNotAppBBar);
+    // print("helperok:" + selectedDateNotAppBBar.toString());
 
-    // Pass the formatted date to the database method to get transactions
     List<Map<String, dynamic>> data =
         await dbHelper.getAllTransactionsForTheDaySelected(formattedDate);
 
-    // Update the transaction data
     setState(() {
       transactionData = data;
     });
 
-    // Fetch the total expense for the selected day
     double totalExpense = await dbHelper.getDateTotalExpense(formattedDate);
+    double totalmonthIncome =
+        await dbHelper.getMonthTotalIncome(formattedMonth, formattedYear);
 
-    // Update the dayTotalExpense state
     setState(() {
       dayTotalExpense = HomeHelper.formatIndianCurrency(totalExpense);
+      totalMIncome = HomeHelper.formatIndianCurrency(totalmonthIncome);
     });
 
-    // Refresh UI after fetching data
     setState(() {});
   }
 
@@ -217,7 +218,7 @@ class _CalenderViewState extends State<CalenderView> {
                         width: 5,
                         height: 5,
                         decoration: BoxDecoration(
-                          color: TColor.secondary,
+                          color: TColor.gray70,
                           borderRadius: BorderRadius.circular(3),
                         ),
                       ),
@@ -260,7 +261,7 @@ class _CalenderViewState extends State<CalenderView> {
                             fontWeight: FontWeight.w500),
                       ),
                       Text(
-                        "Day Expenditure",
+                        "Day Expense Of ${totalMIncome.toString()}",
                         style: TextStyle(
                             color: TColor.gray30,
                             fontSize: 12,
@@ -271,7 +272,6 @@ class _CalenderViewState extends State<CalenderView> {
                 ],
               ),
             ),
-            // Conditional rendering of transaction data
             transactionData.isNotEmpty
                 ? ListView.builder(
                     padding:
@@ -284,17 +284,13 @@ class _CalenderViewState extends State<CalenderView> {
                       return DayTransactions(
                         sObj: {
                           "transaction_type": transaction['transaction_type'],
-                          "name":
-                              transaction['description'], // Use category column
-                          "icon":
-                              transaction['categoryImg'], // Use category image
+                          "name": transaction['description'],
+                          "icon": transaction['categoryImg'],
                           "price": HomeHelper.formatIndianCurrency(
                                   transaction['amount'])
-                              .toString(), // Use the amount
+                              .toString(),
                         },
-                        onPressed: () {
-                          // Handle row press
-                        },
+                        onPressed: () {},
                       );
                     },
                   )

@@ -178,26 +178,6 @@ class _SpendingBudgetsViewState extends State<SpendingBudgetsView> {
                 ),
               ],
             ),
-            // Padding(
-            //   padding: const EdgeInsets.only(top: 35, right: 10),
-            //   child: Row(
-            //     children: [
-            //       const Spacer(),
-            //       IconButton(
-            //         onPressed: () {
-            //           Navigator.push(
-            //             context,
-            //             MaterialPageRoute(
-            //               builder: (context) => const SettingsView(),
-            //             ),
-            //           );
-            //         },
-            //         icon: Image.asset("assets/img/settings.png",
-            //             width: 25, height: 25, color: TColor.gray30),
-            //       ),
-            //     ],
-            //   ),
-            // ),
             Stack(
               alignment: Alignment.bottomCenter,
               children: [

@@ -3,12 +3,12 @@ import 'package:moneytracker/common/color_extension.dart';
 import 'package:moneytracker/common_widget/home_income.dart';
 import 'package:moneytracker/view/home/helper.dart';
 import 'package:moneytracker/view/sqflite/db_helper.dart';
-import 'package:moneytracker/view/subscription_info/delete_dialog.dart';
-import 'package:moneytracker/view/subscription_info/subscription_info_view.dart';
+import 'package:moneytracker/view/home_Expense_info/delete_dialog.dart';
+import 'package:moneytracker/view/home_Expense_info/home_expense_info_view.dart';
 import '../../common_widget/custom_arc_painter.dart';
 import '../../common_widget/segment_button.dart';
 import '../../common_widget/status_button.dart';
-import '../../common_widget/subscription_home_row.dart';
+import '../../common_widget/transaction_home_row.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -18,7 +18,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  bool isSubscription = true; // True for Expense, False for Income
+  bool isSubscription = true;
   List<Map<String, dynamic>> transactionData = [];
   double highestExpense = 0.0;
   double lowestExpense = 0.0;
@@ -31,9 +31,9 @@ class _HomeViewState extends State<HomeView> {
 
   Color getCategoryColor() {
     if (percentage <= 20) return Colors.green;
-    if (percentage <= 40) return Colors.green.shade800; // Dark Green
+    if (percentage <= 40) return Colors.green.shade800;
     if (percentage <= 60) return Colors.orange;
-    if (percentage <= 80) return Colors.red.shade200; // Light Red
+    if (percentage <= 80) return Colors.red.shade200;
     return Colors.red;
   }
 
@@ -264,7 +264,6 @@ class _HomeViewState extends State<HomeView> {
                 ],
               ),
             ),
-            // Show loading indicator when isLoading is true
             if (isLoading)
               const Center(
                 child: CircularProgressIndicator(),
@@ -279,13 +278,9 @@ class _HomeViewState extends State<HomeView> {
                 itemBuilder: (context, index) {
                   var transaction = transactionData[index];
                   return InkWell(
-                    onTap: () {
-                      // Handle the click event
-                      print("Item clicked: ${transaction['description']}");
-                      // Navigate to another screen or perform any action here
-                    },
+                    onTap: () {},
                     child: isSubscription
-                        ? SubScriptionHomeRow(
+                        ? TransactionHomeRow(
                             sObj: {
                               "name": transaction['category'],
                               "icon": transaction['categoryImg'],
@@ -296,31 +291,28 @@ class _HomeViewState extends State<HomeView> {
                             onPressed: () {
                               if (isSubscription) {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            SubscriptionInfoView(
-                                              sObj: {
-                                                "date": transaction['date'],
-                                                "icon":
-                                                    transaction['categoryImg'],
-                                                "name": transaction['category'],
-                                                "price": HomeHelper
-                                                        .formatIndianCurrency(
-                                                            transaction[
-                                                                'amount'])
-                                                    .toString(),
-                                              },
-                                              onCallBack: () {
-                                                // Call setState or any function to refresh the parent widget
-                                                setState(() {
-                                                  _fetchTransactionData();
-                                                  // Refresh the state or reload the data
-                                                });
-                                              },
-                                            )));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HomeExpenseInfoView(
+                                      sObj: {
+                                        "date": transaction['date'],
+                                        "icon": transaction['categoryImg'],
+                                        "name": transaction['category'],
+                                        "price":
+                                            HomeHelper.formatIndianCurrency(
+                                                    transaction['amount'])
+                                                .toString(),
+                                      },
+                                      onCallBack: () {
+                                        setState(() {
+                                          _fetchTransactionData();
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                );
                               }
-                            }, // Optional, since we handle taps via InkWell
+                            },
                           )
                         : HomeIncomeList(
                             sObj: {
@@ -332,7 +324,7 @@ class _HomeViewState extends State<HomeView> {
                             },
                             onPressed: () {
                               print("objectxxx:" + transaction.toString());
-                              // Show a dialog with income details and options
+
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
@@ -348,7 +340,7 @@ class _HomeViewState extends State<HomeView> {
                                     dbHelper: dbHelper,
                                     onDeleteSuccess: () {
                                       setState(() {
-                                        _fetchTransactionData(); // Refresh the data after deletion
+                                        _fetchTransactionData();
                                       });
                                     },
                                   );

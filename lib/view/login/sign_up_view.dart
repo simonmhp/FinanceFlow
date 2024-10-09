@@ -19,18 +19,16 @@ class SignUpView extends StatefulWidget {
 class _SignUpViewState extends State<SignUpView> {
   final TextEditingController txtEmail = TextEditingController();
   final TextEditingController txtPassword = TextEditingController();
-  final TextEditingController txtUsername =
-      TextEditingController(); // Username Controller
+  final TextEditingController txtUsername = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore =
-      FirebaseFirestore.instance; // Firestore instance
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   int passwordStrength = 0;
-  bool isLoading = false; // Loading state
+  bool isLoading = false;
 
   Future<void> _signUp() async {
     setState(() {
-      isLoading = true; // Set loading to true
+      isLoading = true;
     });
 
     try {
@@ -56,10 +54,8 @@ class _SignUpViewState extends State<SignUpView> {
         fontSize: 16.0,
       );
 
-      // Log out the user
       await _auth.signOut();
 
-      // Navigate to the SignInView and remove all previous routes
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const SignInView()),
         (Route<dynamic> route) => false, // Remove all previous routes
@@ -76,7 +72,7 @@ class _SignUpViewState extends State<SignUpView> {
       );
     } finally {
       setState(() {
-        isLoading = false; // Set loading to false after the process
+        isLoading = false;
       });
     }
   }
@@ -112,7 +108,7 @@ class _SignUpViewState extends State<SignUpView> {
                   width: media.width * 0.5, fit: BoxFit.contain),
               const Spacer(),
               RoundTextField(
-                title: "Username", // Username input field
+                title: "Username",
                 controller: txtUsername,
                 keyboardType: TextInputType.text,
               ),
@@ -130,7 +126,6 @@ class _SignUpViewState extends State<SignUpView> {
                 onChanged: (password) => _updatePasswordStrength(password),
               ),
               const SizedBox(height: 20),
-              // Password strength indicator
               Row(
                 children: List.generate(
                   4,
@@ -140,7 +135,7 @@ class _SignUpViewState extends State<SignUpView> {
                       margin: const EdgeInsets.symmetric(horizontal: 1),
                       decoration: BoxDecoration(
                         color: index < passwordStrength
-                            ? Colors.green // Strength indicator color
+                            ? Colors.green
                             : TColor.white,
                       ),
                     ),
@@ -158,11 +153,8 @@ class _SignUpViewState extends State<SignUpView> {
                 ],
               ),
               const SizedBox(height: 20),
-              // Show loading indicator or button based on loading state
               isLoading
-                  ? Center(
-                      child:
-                          CircularProgressIndicator()) // Show loading spinner
+                  ? const Center(child: CircularProgressIndicator())
                   : PrimaryButton(
                       title: "Get started, it's free!",
                       onPressed: _signUp,

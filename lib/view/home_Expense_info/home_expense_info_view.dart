@@ -4,24 +4,24 @@ import 'package:intl/intl.dart';
 import 'package:moneytracker/common_widget/expense_card_transaction.dart';
 import 'package:moneytracker/view/home/helper.dart';
 import 'package:moneytracker/view/sqflite/db_helper.dart';
-import 'package:moneytracker/view/subscription_info/delete_dialog.dart';
+import 'package:moneytracker/view/home_Expense_info/delete_dialog.dart';
 
 import '../../common/color_extension.dart';
 
-class SubscriptionInfoView extends StatefulWidget {
+class HomeExpenseInfoView extends StatefulWidget {
   final Map sObj;
   final VoidCallback onCallBack;
-  const SubscriptionInfoView({
+  const HomeExpenseInfoView({
     super.key,
     required this.sObj,
     required this.onCallBack,
   });
 
   @override
-  State<SubscriptionInfoView> createState() => _SubscriptionInfoViewState();
+  State<HomeExpenseInfoView> createState() => _HomeExpenseInfoViewState();
 }
 
-class _SubscriptionInfoViewState extends State<SubscriptionInfoView> {
+class _HomeExpenseInfoViewState extends State<HomeExpenseInfoView> {
   List<Map<String, dynamic>> transactionData = [];
   String dayTotalExpense = "";
   DatabaseHelper dbHelper = DatabaseHelper();
@@ -37,25 +37,18 @@ class _SubscriptionInfoViewState extends State<SubscriptionInfoView> {
   }
 
   Future<void> _fetchTransactionData() async {
-    // Pass the formatted date to the database method to get transactions
     List<Map<String, dynamic>> data =
         await dbHelper.getMonthCategoryExpense(widget.sObj['name']);
 
-    // Update the transaction data
     setState(() {
       transactionData = data;
     });
 
-    // Fetch the total expense for the selected day
     double totalExpense =
         await dbHelper.getDateTotalExpense(widget.sObj['date']);
-
-    // Update the dayTotalExpense state
     setState(() {
       dayTotalExpense = HomeHelper.formatIndianCurrency(totalExpense);
     });
-
-    // Refresh UI after fetching data
     setState(() {});
   }
 
@@ -107,15 +100,6 @@ class _SubscriptionInfoViewState extends State<SubscriptionInfoView> {
                                 style: TextStyle(
                                     color: TColor.gray30, fontSize: 16),
                               ),
-                              // IconButton(
-                              //   onPressed: () {
-                              //     Navigator.pop(context);
-                              //   },
-                              //   icon: Image.asset("assets/img/Trash.png",
-                              //       width: 25,
-                              //       height: 25,
-                              //       color: TColor.gray30),
-                              // ),
                             ],
                           ),
                           const Spacer(),
@@ -175,14 +159,11 @@ class _SubscriptionInfoViewState extends State<SubscriptionInfoView> {
                                     "date": transaction['date'],
                                     "transaction_type":
                                         transaction['transaction_type'],
-                                    "name": transaction[
-                                        'description'], // Use category column
-                                    "icon": transaction[
-                                        'categoryImg'], // Use category image
+                                    "name": transaction['description'],
+                                    "icon": transaction['categoryImg'],
                                     "price": HomeHelper.formatIndianCurrency(
                                             transaction['amount'])
                                         .toString(),
-                                    // Use the amount
                                   },
                                   onPressed: () {
                                     showDialog(
@@ -200,10 +181,8 @@ class _SubscriptionInfoViewState extends State<SubscriptionInfoView> {
                                           date: transaction['date'],
                                           dbHelper: dbHelper,
                                           onDeleteSuccess: () {
-                                            // Call setState or any function to refresh the parent widget
                                             setState(() {
                                               _fetchTransactionData();
-                                              // Refresh the state or reload the data
                                             });
                                           },
                                         );
@@ -217,7 +196,6 @@ class _SubscriptionInfoViewState extends State<SubscriptionInfoView> {
                           const SizedBox(
                             height: 20,
                           ),
-                          // SecondaryButton(title: "Save", onPressed: () {})
                         ],
                       ),
                     )

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../common/color_extension.dart';
 
-class SubScriptionHomeRow extends StatelessWidget {
+class TransactionHomeRow extends StatelessWidget {
   final Map sObj;
   final VoidCallback onPressed;
 
-  const SubScriptionHomeRow(
+  const TransactionHomeRow(
       {super.key, required this.sObj, required this.onPressed});
 
   @override
