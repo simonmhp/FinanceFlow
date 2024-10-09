@@ -1,4 +1,4 @@
-# moneytracker
+# FinanceFlow
 
 A new Flutter project.
 
